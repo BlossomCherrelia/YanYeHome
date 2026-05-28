@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "82333765356",
+    "project_id": "yanyehome",
+    "storage_bucket": "yanyehome.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82333765356:android:2a949f91f7a0809b815fc9",
+        "android_client_info": {
+          "package_name": "com.yanye.home"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBghxUErUVla5g7mCu6hq91Si9zd3yUvlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

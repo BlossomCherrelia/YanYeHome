@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>妍叶之庭 YanYe Home 情侣 App 需求文档</title>
+  <style>
+    :root {
+      --ink: #25211d;
+      --muted: #6f6860;
+      --line: #e8dfd5;
+      --paper: #fffaf4;
+      --soft: #f5eee6;
+      --rose: #d85b73;
+      --rose-soft: #ffe3e8;
+      --green: #3f8f78;
+      --green-soft: #dff3ed;
+      --blue: #4777a8;
+      --blue-soft: #e3edf7;
+      --gold: #b98228;
+      --gold-soft: #fff0cf;
+      --shadow: 0 18px 55px rgba(69, 50, 32, 0.12);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fffaf4 0%, #f7efe6 42%, #fffaf4 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.68;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: 92vh;
+      display: grid;
+      align-items: center;
+      padding: 44px 28px 24px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(37, 33, 29, 0.68), rgba(37, 33, 29, 0.22) 48%, rgba(37, 33, 29, 0.08)),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=85") center / cover;
+      color: #fff;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 150px;
+      background: linear-gradient(180deg, transparent, #fffaf4);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 13px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      opacity: 0.86;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 860px;
+      font-size: clamp(42px, 7vw, 88px);
+      line-height: 0.98;
+      letter-spacing: 0;
+      font-weight: 800;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 24px 0 34px;
+      font-size: clamp(17px, 2vw, 22px);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      backdrop-filter: blur(12px);
+    }
+
+    .peek {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 20px;
+      z-index: 2;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 56px 0 86px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(255, 250, 244, 0.86);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      margin: 0 calc(50% - 50vw);
+      padding: 10px max(18px, calc((100vw - 1120px) / 2));
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .nav a {
+      white-space: nowrap;
+      font-size: 14px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      color: var(--muted);
+    }
+
+    .nav a:hover {
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    section {
+      padding: 54px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    section:last-child {
+      border-bottom: 0;
+    }
+
+    .section-title {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(280px, 0.28fr);
+      gap: 34px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(69, 50, 32, 0.05);
+    }
+
+    .card.strong {
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--ink);
+      background: var(--soft);
+    }
+
+    .tag.rose { background: var(--rose-soft); color: #9d3348; }
+    .tag.green { background: var(--green-soft); color: #226b57; }
+    .tag.blue { background: var(--blue-soft); color: #285d8f; }
+    .tag.gold { background: var(--gold-soft); color: #7f561c; }
+
+    ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .principle-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .principle {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .principle b {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .flow-step {
+      min-height: 178px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      position: relative;
+    }
+
+    .flow-step::before {
+      content: attr(data-step);
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .feature {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 24px;
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .feature:first-of-type {
+      border-top: 0;
+    }
+
+    .feature-label {
+      position: sticky;
+      top: 74px;
+      align-self: start;
+    }
+
+    .feature-label .tag {
+      margin-bottom: 10px;
+    }
+
+    .feature-content {
+      display: grid;
+      gap: 14px;
+    }
+
+    .requirement-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .requirement-table th,
+    .requirement-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .requirement-table th {
+      color: var(--muted);
+      background: #fbf5ee;
+      font-weight: 700;
+    }
+
+    .requirement-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .priority {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .priority.p1 { background: var(--rose); }
+    .priority.p2 { background: var(--blue); }
+    .priority.p3 { background: var(--green); }
+
+    .map-preview {
+      min-height: 330px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .china {
+      aspect-ratio: 1.28;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(63, 143, 120, 0.2), rgba(71, 119, 168, 0.16)),
+        #f7fbf8;
+      border: 1px solid #dce8df;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .province {
+      position: absolute;
+      border-radius: 34% 47% 42% 35%;
+      background: #dce8df;
+      border: 1px solid rgba(63, 143, 120, 0.26);
+    }
+
+    .province.on {
+      background: linear-gradient(135deg, #66b89e, #f0c76d);
+      box-shadow: 0 8px 24px rgba(63, 143, 120, 0.28);
+    }
+
+    .province:nth-child(1) { width: 28%; height: 22%; left: 12%; top: 12%; }
+    .province:nth-child(2) { width: 30%; height: 26%; left: 39%; top: 14%; transform: rotate(8deg); }
+    .province:nth-child(3) { width: 25%; height: 22%; left: 60%; top: 35%; transform: rotate(-10deg); }
+    .province:nth-child(4) { width: 34%; height: 26%; left: 24%; top: 40%; transform: rotate(-6deg); }
+    .province:nth-child(5) { width: 24%; height: 20%; left: 43%; top: 62%; transform: rotate(14deg); }
+    .province:nth-child(6) { width: 16%; height: 13%; left: 70%; top: 64%; transform: rotate(18deg); }
+
+    .city-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .city {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      background: var(--soft);
+    }
+
+    .city span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--line);
+    }
+
+    .milestone {
+      position: relative;
+      margin: 0 0 22px;
+      padding: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .milestone::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 24px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--rose);
+      border: 3px solid var(--paper);
+    }
+
+    .footer {
+      padding: 34px 0 70px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 860px) {
+      .section-title,
+      .principles,
+      .feature,
+      .map-preview {
+        grid-template-columns: 1fr;
+      }
+
+      .grid,
+      .grid.two,
+      .principle-board {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-label {
+        position: static;
+      }
+
+      .hero {
+        min-height: 88vh;
+        padding: 34px 20px 78px;
+      }
+
+      .peek {
+        left: 20px;
+        right: 20px;
+      }
+
+      .requirement-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="hero-inner">
+      <div class="eyebrow">Product Requirement Document · YanYe Home</div>
+      <h1>妍叶之庭<br />YanYe Home</h1>
+      <p>
+        一款给两个人长期使用的私密情侣 App。它不追求功能数量，而是围绕“今天怎么过、接下来去哪、过去留下什么、吵架后如何回来”建立稳定闭环。
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="#vision">阅读产品定位</a>
+        <a class="button secondary" href="#features">查看功能需求</a>
+      </div>
+    </div>
+    <div class="peek">下方包含产品原则、核心闭环、功能优先级、数据结构、MVP 规划与隐私策略</div>
+  </header>
+
+  <main>
+    <nav class="nav" aria-label="文档导航">
+      <a href="#vision">定位</a>
+      <a href="#principles">原则</a>
+      <a href="#loop">闭环</a>
+      <a href="#features">功能</a>
+      <a href="#interaction">联动</a>
+      <a href="#data">数据</a>
+      <a href="#mvp">MVP</a>
+      <a href="#privacy">隐私</a>
+    </nav>
+
+    <section id="vision">
+      <div class="section-title">
+        <div>
+          <h2>产品定位</h2>
+          <p class="lead">
+            妍叶之庭 YanYe Home 是一个“情侣生活操作系统”，核心不是记录爱，而是让两个人更容易把爱落实到行动里。
+          </p>
+        </div>
+        <p class="meta">
+          目标平台：Android 优先。后续可扩展为 PWA 或微信小程序。视觉方向为日系极简、干净、无广告、轻动效、重隐私。
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card strong">
+          <span class="tag rose">核心人群</span>
+          <h3>长期稳定、互动密度高的情侣</h3>
+          <p>
+            两人关系基础深，已经有大量共同记忆、内部笑点和未来规划。App 应该承接真实生活，而不是制造表演型打卡。
+          </p>
+        </article>
+        <article class="card strong">
+          <span class="tag blue">核心痛点</span>
+          <h3>不是没爱，是生活太碎</h3>
+          <p>
+            吃什么、去哪玩、纪念日、旅行回忆、承诺兑现、冷战破冰都分散在聊天记录里，时间久了很难检索，也难以沉淀。
+          </p>
+        </article>
+        <article class="card strong">
+          <span class="tag green">核心价值</span>
+          <h3>减少消耗，增加留下来的东西</h3>
+          <p>
+            把容易反复争执的事项产品化，把值得珍惜的瞬间结构化，让 App 每次打开都能帮忙做一件具体有用的事。
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="principles">
+      <div class="principles">
+        <div>
+          <h2>产品原则</h2>
+          <p class="lead">
+            本产品必须克制。每个功能都要回答一个问题：它是否能被反复使用，是否能和已有数据产生联动，是否能让关系变轻一点。
+          </p>
+        </div>
+        <div class="principle-board">
+          <div class="principle">
+            <b>1. 少模块，多闭环</b>
+            <span class="meta">不做孤立功能。愿望清单、日程、地图、挑战、纪念日必须互相生成内容。</span>
+          </div>
+          <div class="principle">
+            <b>2. 轻输入，重回看</b>
+            <span class="meta">日常记录不能太麻烦。优先使用选择、模板、照片、标签，而不是长篇填写。</span>
+          </div>
+          <div class="principle">
+            <b>3. 隐私默认安全</b>
+            <span class="meta">吵架记录、私密愿望、信箱、健康记录、边界相关内容默认只有创建者可见。</span>
+          </div>
+          <div class="principle">
+            <b>4. 关系修复优先</b>
+            <span class="meta">冲突模块不用于审判谁错，而是帮助降温、复盘、兑现承诺。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="loop">
+      <div class="section-title">
+        <div>
+          <h2>核心使用闭环</h2>
+          <p class="lead">
+            App 的主线是“计划一次共同体验，完成后沉淀为回忆，回忆再反哺下一次计划”。
+          </p>
+        </div>
+        <p class="meta">
+          这条闭环保证功能不是堆砌：每个模块都能把数据传给下一个模块。
+        </p>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step" data-step="1">
+          <h3>灵感进入</h3>
+          <p>愿望清单、随机挑战、今天吃什么、纪念日提醒产生一个可执行想法。</p>
+        </div>
+        <div class="flow-step" data-step="2">
+          <h3>变成日程</h3>
+          <p>双方确认时间后，自动进入情侣日历，并附带预算、地点、准备事项。</p>
+        </div>
+        <div class="flow-step" data-step="3">
+          <h3>一起完成</h3>
+          <p>当天 App 只展示和这件事有关的信息：路线、餐厅、任务、拍照入口。</p>
+        </div>
+        <div class="flow-step" data-step="4">
+          <h3>沉淀回忆</h3>
+          <p>照片、花费、城市、省份、美食、心情、梗自动归档到时间线和地图。</p>
+        </div>
+        <div class="flow-step" data-step="5">
+          <h3>再次唤起</h3>
+          <p>纪念日前、吵架后、周末前，App 从旧回忆里推荐可复刻的小计划。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="section-title">
+        <div>
+          <h2>核心功能需求</h2>
+          <p class="lead">
+            以下保留了最初提出的必需功能，并从问卷中筛选出能长期产生价值的增强能力。
+          </p>
+        </div>
+        <p class="meta">
+          优先级：P1 为首版必须实现，P2 为首版可简化实现，P3 为后续增强。
+        </p>
+      </div>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag rose">P1 · 首页</span>
+          <h3>今日面板</h3>
+          <p class="meta">所有功能的入口不直接平铺，而是通过今日状态聚合。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              首页展示今天最该被看见的内容：最近纪念日、当天日程、待确认愿望、吃什么入口、双方心情状态、下班提醒、未完成承诺。避免用户每次打开都面对一堆模块图标。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>今日卡片</td>
+                <td>自动聚合纪念日、日程、愿望、挑战、冲突冷却状态。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>状态灯</td>
+                <td>同步“开心、累、想贴贴、需要独处、在忙”等轻量状态。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>下班打卡提醒</td>
+                <td>到预设下班时间弹窗提醒，一键发送“下班啦”“在路上”“今天要加班”。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>快捷行动</td>
+                <td>一键进入“吃什么”“新增日程”“记录回忆”“冷静模式”“新备忘”。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag gold">P1 · 纪念日</span>
+          <h3>纪念日与倒数日</h3>
+          <p class="meta">必须功能。承担提醒、回忆和仪式感。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              支持添加恋爱纪念日、生日、节日、第一次旅行、定情信物日期等。每个纪念日不仅是倒数，还能绑定礼物愿望、餐厅候选、历史照片和去年如何庆祝。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>倒数与周年</td>
+                <td>显示距离某日还有几天、已经在一起多久、第几个周年。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>礼物联动</td>
+                <td>纪念日前自动推荐双方公开或私密愿望清单中的礼物灵感。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>庆祝档案</td>
+                <td>记录每年吃了什么、送了什么、去了哪里、拍了哪些照片。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag blue">P1 · 愿望</span>
+          <h3>愿望清单</h3>
+          <p class="meta">必须功能。支持共享与仅自己可见。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              愿望不是普通备忘录，而是未来日程、礼物和挑战的灵感池。分类包含购物、游玩、餐厅、礼物、家具、养狗准备、共同学习、必看必玩等。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>可见性</td>
+                <td>每条愿望可设为双方可见、仅自己可见、指定日期后可见。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>分类与标签</td>
+                <td>支持购物、游玩、餐厅、礼物、家具、养狗、电影、游戏等分类。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>转日程</td>
+                <td>愿望确认后可一键生成日程，自动带入地点、预算、准备事项。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>快乐预算提示</td>
+                <td>针对游戏充值等即时消费设置个人快乐预算，只做温和提醒。</td>
+                <td><span class="priority p3">P3</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag green">P1 · 日程</span>
+          <h3>情侣日历</h3>
+          <p class="meta">必须功能。承接所有“要一起做的事”。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              共同日历用于记录约会、旅行、纪念日、演出活动、养狗准备、家务维修和共同任务。它不是商务日历，而是两个人的生活安排中心。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>共同事件</td>
+                <td>标题、时间、地点、提醒、预算、参与人、关联愿望。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>攻略模式</td>
+                <td>适合你们的攻略型出游，事件下可添加餐厅、活动、路线、备选方案。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+              <tr>
+                <td>完成归档</td>
+                <td>日程结束后提示补充照片、美食、花费、心情，并生成回忆卡。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag green">P1 · 地图</span>
+          <h3>点亮地图</h3>
+          <p class="meta">必须功能。省份级到城市级的足迹回忆。</p>
+        </div>
+        <div class="feature-content">
+          <div class="map-preview">
+            <div class="china" aria-label="点亮地图示意">
+              <div class="province on"></div>
+              <div class="province"></div>
+              <div class="province on"></div>
+              <div class="province on"></div>
+              <div class="province"></div>
+              <div class="province on"></div>
+            </div>
+            <div>
+              <h3>地图不是打卡表，是回忆索引</h3>
+              <p>
+                全国省份地图展示已点亮省份，点击省份进入市级地图。每个城市可以绑定“吃了什么、玩了什么、照片、日程、梗、花费、避坑提示”。
+              </p>
+              <div class="city-list">
+                <div class="city"><b>北京</b><span>麦当劳、演出、纪念日大餐</span></div>
+                <div class="city"><b>上海</b><span>日料、展览、随机挑战</span></div>
+                <div class="city"><b>成都</b><span>烧烤、酒店躺平、旅行复盘</span></div>
+              </div>
+            </div>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>省市二级点亮</td>
+                <td>中国省份级地图，点击进入城市级地图；支持手动点亮。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>旅行记忆</td>
+                <td>记录当地吃过的店、玩过的地方、避坑、照片、评分和日期。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>日程联动</td>
+                <td>旅行日程完成后自动询问是否点亮城市并生成城市回忆。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag rose">P1 · 冲突</span>
+          <h3>吵架记录与修复</h3>
+          <p class="meta">必须功能。重点是降温和复盘，不是审判。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              你们的冲突特点是当面爆发、短暂冷战、通常男方先破冰，核心需求是“冷战期间不要断联”和“承诺要兑现”。因此冲突模块分为冷静模式、道歉小气泡、复盘记录、承诺墙四层。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>冷静模式</td>
+                <td>一键进入低刺激界面，只保留状态投递：需要独处、可以抱抱、稍后聊。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>道歉小气泡</td>
+                <td>提供低压力破冰入口，可发送“我错了”“想抱一下”“我会改”“先不吵了”等可爱气泡。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>吵架复盘</td>
+                <td>模板化记录触发原因、真实情绪、希望对方下次怎么做、是否已经和好。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>承诺兑现墙</td>
+                <td>道歉后的承诺进入待兑现列表，完成后由对方确认，形成信任记录。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+              <tr>
+                <td>敏感话题提醒</td>
+                <td>记录前任、特定虚拟主播、异性边界等高敏话题，只在复盘时可见。</td>
+                <td><span class="priority p3">P3</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag gold">P1 · 决策</span>
+          <h3>今天吃什么</h3>
+          <p class="meta">必须功能。解决每天都会出现的真实问题。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              “今天吃什么”采用转盘与筛选结合。先根据忌口、距离、预算、营业时间、最近吃过次数过滤，再用转盘提供仪式感。核心规则必须记住：不推荐蘑菇；烧烤、日料、麦当劳、海鲜、猪肉类偏好可作为权重。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>餐厅池</td>
+                <td>支持自建餐厅、菜系、忌口、价格、地址、是否踩雷。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>偏好过滤</td>
+                <td>按“不吃蘑菇”、想吃肉、想吃海鲜、是否外卖、是否出门过滤。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>转盘决策</td>
+                <td>筛选后再转盘，结果可一键变成日程或记录到城市美食档案。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>公平权重</td>
+                <td>统计近期谁妥协更多，下一次决策适度倾斜给对方偏好。</td>
+                <td><span class="priority p3">P3</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag rose">P1 · 照顾</span>
+          <h3>关怀备忘中心</h3>
+          <p class="meta">承接备忘录、下班提醒、姨妈记录这些高频但不宜做重的需求。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              关怀备忘中心用于处理两个人每天会忘、但忘了会影响体验的小事：下班有没有回家、明天要带什么、姨妈期是否需要照顾、最近是不是怕冷或状态差。它不做复杂健康管理，而是做“亲密关系里的提醒与照顾”。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>共享备忘录</td>
+                <td>支持共享或私密备忘，可设置提醒、清单、图片、关联日程，例如带伞、买药、取快递。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>下班弹窗提醒</td>
+                <td>按工作日和自定义时间弹窗，一键同步“下班啦”“晚点走”“到家了”，减少对方等待和担心。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>姨妈记录</td>
+                <td>记录周期、开始/结束日期、疼痛程度、情绪、忌口和照顾偏好；默认私密，可选择共享提醒。</td>
+                <td><span class="priority p1">P1</span></td>
+              </tr>
+              <tr>
+                <td>照顾建议</td>
+                <td>姨妈期或状态差时，首页给对方显示轻量提示，例如准备热水、别安排太累的行程。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag blue">P2 · 回忆</span>
+          <h3>时光信箱与梗百科</h3>
+          <p class="meta">保留“时光信箱”，新增长期价值最高的梗库。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              时光信箱用于延时开启的信、照片、承诺和未来祝福。梗百科用于记录你们独有的黑话、冷笑话、儿童派瞬间、游戏和二次元记忆。它们共同承担“多年后再看仍然珍贵”的价值。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>延时信件</td>
+                <td>写给未来某天的对方或双方，未到时间不可查看。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+              <tr>
+                <td>梗百科</td>
+                <td>词条、来源、相关照片、关联人物、第一次出现时间、搜索。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+              <tr>
+                <td>导出纪念册</td>
+                <td>后续支持按年份导出 PDF 或网页纪念册。</td>
+                <td><span class="priority p3">P3</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-label">
+          <span class="tag green">P2 · 挑战</span>
+          <h3>Adventure Scratch Off</h3>
+          <p class="meta">必须功能。以刮刮乐呈现 50 个情侣挑战。</p>
+        </div>
+        <div class="feature-content">
+          <div class="card">
+            <h3>需求描述</h3>
+            <p>
+              预设 50 个小挑战，例如一起看日出、去对方小学门口吃零食、互相给对方搭一套穿搭、一起完成一次 AI 视频、寻找北京一家宠物友好咖啡店。刮开前只显示难度、预算、时长和天气需求，刮开后可接受、改期或放弃。
+            </p>
+          </div>
+          <table class="requirement-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>说明</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>刮刮乐交互</td>
+                <td>刮开后显示挑战内容，支持接受并生成日程。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+              <tr>
+                <td>完成认证</td>
+                <td>完成后上传照片、文字、地点，可点亮挑战徽章。</td>
+                <td><span class="priority p2">P2</span></td>
+              </tr>
+              <tr>
+                <td>个性化挑战池</td>
+                <td>结合你们的偏好：动物、游戏、二次元、烧烤日料、北京生活、养狗准备。</td>
+                <td><span class="priority p3">P3</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="interaction">
+      <div class="section-title">
+        <div>
+          <h2>关键联动设计</h2>
+          <p class="lead">
+            为了避免“没用模块集合”，首版至少要实现这些跨模块联动。
+          </p>
+        </div>
+        <p class="meta">
+          联动越自然，用户越不需要记住有哪些功能。
+        </p>
+      </div>
+
+      <div class="grid two">
+        <article class="card">
+          <span class="tag rose">愿望 → 日程 → 回忆</span>
+          <h3>愿望不是收藏夹</h3>
+          <p>愿望被双方确认后生成日程；日程完成后自动归档为回忆；如果包含地点，则同步到点亮地图。</p>
+        </article>
+        <article class="card">
+          <span class="tag gold">纪念日 → 礼物 → 私密愿望</span>
+          <h3>礼物不靠猜命</h3>
+          <p>纪念日前自动提示“可公开愿望”和“仅自己可见的礼物计划”，既有惊喜感，也不会完全失手。</p>
+        </article>
+        <article class="card">
+          <span class="tag green">吃什么 → 餐厅档案 → 城市地图</span>
+          <h3>每顿饭都能沉淀</h3>
+          <p>转盘选中的餐厅吃完后可评分、记录菜品与避坑；如果在旅行城市，则同步到城市回忆。</p>
+        </article>
+        <article class="card">
+          <span class="tag blue">吵架 → 承诺 → 今日面板</span>
+          <h3>复盘要有后续</h3>
+          <p>复盘里产生的承诺进入今日面板待办。完成后由对方确认，减少“说了但没做到”的二次失望。</p>
+        </article>
+        <article class="card">
+          <span class="tag green">挑战 → 日程 → 徽章</span>
+          <h3>随机性必须可执行</h3>
+          <p>刮开挑战后必须能直接安排时间、添加准备事项，完成后点亮徽章并写入年度回忆。</p>
+        </article>
+        <article class="card">
+          <span class="tag blue">状态灯 → 冷静模式</span>
+          <h3>低成本表达</h3>
+          <p>当一方设置“需要独处”或“想被抱抱”，另一方首页同步展示，避免因为不说话产生额外误会。</p>
+        </article>
+        <article class="card">
+          <span class="tag rose">姨妈记录 → 今日面板 → 日程建议</span>
+          <h3>照顾要能落地</h3>
+          <p>姨妈期可在首页给对方轻提示，并在安排日程或随机挑战时降低强度，优先推荐室内、近距离、少走路方案。</p>
+        </article>
+        <article class="card">
+          <span class="tag gold">下班打卡 → 状态灯 → 吃什么</span>
+          <h3>从“下班了吗”到“吃什么”</h3>
+          <p>下班弹窗同步状态后，可顺手进入吃什么或晚间日程，减少反复问询，也让见面安排更自然。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="data">
+      <div class="section-title">
+        <div>
+          <h2>信息架构与数据对象</h2>
+          <p class="lead">
+            数据结构要围绕“事件”和“回忆”设计，而不是围绕页面设计。
+          </p>
+        </div>
+        <p class="meta">
+          首版可使用本地数据库，后续增加双人同步与端到端加密。
+        </p>
+      </div>
+
+      <table class="requirement-table">
+        <thead>
+          <tr>
+            <th>对象</th>
+            <th>关键字段</th>
+            <th>关联对象</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Anniversary</td>
+            <td>名称、日期、类型、提醒规则、关联照片、关联愿望</td>
+            <td>Wish、Memory、Schedule</td>
+          </tr>
+          <tr>
+            <td>Wish</td>
+            <td>标题、分类、可见性、预算、地点、优先级、目标日期</td>
+            <td>Schedule、Anniversary、GiftPlan</td>
+          </tr>
+          <tr>
+            <td>Schedule</td>
+            <td>标题、时间、地点、参与人、预算、准备清单、完成状态</td>
+            <td>Wish、MapPlace、Memory、Expense</td>
+          </tr>
+          <tr>
+            <td>MapPlace</td>
+            <td>省份、城市、坐标、点亮状态、吃喝玩乐记录、避坑</td>
+            <td>Schedule、Memory、Restaurant</td>
+          </tr>
+          <tr>
+            <td>ConflictReview</td>
+            <td>触发点、情绪、诉求、道歉方式、和好时间、复盘结论</td>
+            <td>Promise、Status、ApologyBubble</td>
+          </tr>
+          <tr>
+            <td>ApologyBubble</td>
+            <td>气泡文案、发送人、发送时间、关联冲突、是否已回应、回应方式</td>
+            <td>ConflictReview、Promise、Status</td>
+          </tr>
+          <tr>
+            <td>Promise</td>
+            <td>承诺内容、提出人、负责人、截止时间、验收人、状态</td>
+            <td>ConflictReview、HomeToday</td>
+          </tr>
+          <tr>
+            <td>Memory</td>
+            <td>标题、日期、照片、地点、心情、关联日程、关联梗</td>
+            <td>MapPlace、GengEntry、Anniversary</td>
+          </tr>
+          <tr>
+            <td>Challenge</td>
+            <td>标题、难度、预算、天气需求、刮开状态、完成照片</td>
+            <td>Schedule、Memory</td>
+          </tr>
+          <tr>
+            <td>Memo</td>
+            <td>标题、内容、清单、图片、提醒时间、可见性、完成状态</td>
+            <td>Schedule、HomeToday、Reminder</td>
+          </tr>
+          <tr>
+            <td>CareCycle</td>
+            <td>开始日期、结束日期、周期长度、疼痛程度、情绪、照顾偏好、共享范围</td>
+            <td>HomeToday、Schedule、Reminder</td>
+          </tr>
+          <tr>
+            <td>CommuteCheckin</td>
+            <td>预设下班时间、打卡状态、弹窗文案、到家状态、是否加班</td>
+            <td>Status、HomeToday、Restaurant</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="mvp">
+      <div class="section-title">
+        <div>
+          <h2>MVP 版本规划</h2>
+          <p class="lead">
+            首版目标不是“一次做完所有浪漫想象”，而是做出一个每天或每周真的会打开的版本。
+          </p>
+        </div>
+        <p class="meta">
+          建议 6-8 周完成可用首版，后续按使用频率迭代。
+        </p>
+      </div>
+
+      <div class="timeline">
+        <div class="milestone">
+          <h3>V0.1 · 私密单机原型</h3>
+          <p>实现纪念日、愿望清单、情侣日历、今天吃什么、基础备忘录、姨妈记录、基础回忆归档。数据本地存储，先保证你自己能完整跑通核心闭环。</p>
+        </div>
+        <div class="milestone">
+          <h3>V0.2 · 双人可用版本</h3>
+          <p>加入双人账号、共享与私密可见性、状态灯、下班打卡提醒、冷静模式、道歉小气泡、愿望转日程、日程转回忆。</p>
+        </div>
+        <div class="milestone">
+          <h3>V0.3 · 地图与挑战版本</h3>
+          <p>实现省市二级点亮地图、城市回忆、Adventure Scratch Off、完成后照片点亮。</p>
+        </div>
+        <div class="milestone">
+          <h3>V1.0 · 情人节礼物版本</h3>
+          <p>完善视觉、动效、隐私加密、数据备份、纪念册视图，并预置你们专属的餐厅、梗、挑战和纪念日。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="section-title">
+        <div>
+          <h2>隐私与边界</h2>
+          <p class="lead">
+            这是情侣 App 最容易做错的部分。产品要增强安全感，而不是制造监控感。
+          </p>
+        </div>
+        <p class="meta">
+          默认尊重私人空间：可以分享，但不能强迫透明。
+        </p>
+      </div>
+
+      <div class="grid two">
+        <article class="card">
+          <span class="tag rose">默认私密</span>
+          <h3>敏感内容先保护</h3>
+          <p>吵架复盘、私密愿望、时光信箱、礼物计划、姨妈记录、边界话题默认仅创建者可见，分享需要主动确认。</p>
+        </article>
+        <article class="card">
+          <span class="tag rose">健康边界</span>
+          <h3>姨妈记录由本人控制</h3>
+          <p>周期、症状和情绪属于敏感健康数据。对方只能看到本人选择共享的提醒级信息，例如“今天不舒服”“别安排太累”。</p>
+        </article>
+        <article class="card">
+          <span class="tag blue">不做监控</span>
+          <h3>拒绝位置追踪与查岗依赖</h3>
+          <p>不做常驻定位、不做强制拍照查岗。趣味互动可以存在，但必须可拒绝、可关闭、可追溯。</p>
+        </article>
+        <article class="card">
+          <span class="tag green">端到端加密</span>
+          <h3>双人数据只属于两个人</h3>
+          <p>后续云同步版本应使用端到端加密。服务端只保存密文，无法读取具体内容。</p>
+        </article>
+        <article class="card">
+          <span class="tag gold">关系友好</span>
+          <h3>冲突记录不做排行榜</h3>
+          <p>不统计谁错得更多，不展示吵架次数排行榜。复盘只服务于理解、和好和承诺兑现。</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <div>
+          <h2>不建议首版实现的功能</h2>
+          <p class="lead">
+            以下想法有趣，但首版容易增加复杂度或造成压力，建议暂缓。
+          </p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <h3>心跳或呼吸震动同步</h3>
+          <p>实现成本高，用户本人也认为必要性不足。可以用“想贴贴”状态灯替代。</p>
+        </article>
+        <article class="card">
+          <h3>复杂共同财务系统</h3>
+          <p>你们目前财务只是部分重合，首版不需要做完整账本。保留大额预算、旅行花费记录即可。</p>
+        </article>
+        <article class="card">
+          <h3>社交边界报备系统</h3>
+          <p>容易从安全感工具变成压力工具。可先在冲突复盘里记录边界共识，不做日常报备。</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="footer">
+      妍叶之庭 YanYe Home 的首要目标：让你们在忙、累、纠结、吵完架的时候，仍然更容易回到彼此身边。
+    </div>
+  </main>
+</body>
+</html>

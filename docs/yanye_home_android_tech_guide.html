@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>妍叶之庭 YanYe Home Android 原生开发技术选型攻略</title>
+  <style>
+    :root {
+      --ink: #25211d;
+      --muted: #6f6860;
+      --line: #e8dfd5;
+      --paper: #fffaf4;
+      --soft: #f5eee6;
+      --rose: #d85b73;
+      --rose-soft: #ffe3e8;
+      --green: #3f8f78;
+      --green-soft: #dff3ed;
+      --blue: #4777a8;
+      --blue-soft: #e3edf7;
+      --gold: #b98228;
+      --gold-soft: #fff0cf;
+      --shadow: 0 18px 55px rgba(69, 50, 32, 0.12);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fffaf4 0%, #f7efe6 42%, #fffaf4 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.7;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: 88vh;
+      display: grid;
+      align-items: center;
+      padding: 44px 28px 24px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(37, 33, 29, 0.72), rgba(37, 33, 29, 0.28) 48%, rgba(37, 33, 29, 0.1)),
+        url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=2200&q=85") center / cover;
+      color: #fff;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 150px;
+      background: linear-gradient(180deg, transparent, #fffaf4);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 13px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      opacity: 0.86;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 900px;
+      font-size: clamp(42px, 7vw, 84px);
+      line-height: 1;
+      letter-spacing: 0;
+      font-weight: 800;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 24px 0 34px;
+      font-size: clamp(17px, 2vw, 22px);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      backdrop-filter: blur(12px);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 56px 0 86px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(255, 250, 244, 0.86);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      margin: 0 calc(50% - 50vw);
+      padding: 10px max(18px, calc((100vw - 1120px) / 2));
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .nav a {
+      white-space: nowrap;
+      font-size: 14px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      color: var(--muted);
+    }
+
+    .nav a:hover {
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    section {
+      padding: 54px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    section:last-child {
+      border-bottom: 0;
+    }
+
+    .section-title {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(280px, 0.28fr);
+      gap: 34px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(69, 50, 32, 0.05);
+    }
+
+    .card.strong {
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--ink);
+      background: var(--soft);
+    }
+
+    .tag.rose { background: var(--rose-soft); color: #9d3348; }
+    .tag.green { background: var(--green-soft); color: #226b57; }
+    .tag.blue { background: var(--blue-soft); color: #285d8f; }
+    .tag.gold { background: var(--gold-soft); color: #7f561c; }
+
+    ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-size: 0.92em;
+    }
+
+    pre {
+      margin: 12px 0 0;
+      padding: 16px;
+      overflow-x: auto;
+      background: #25211d;
+      color: #fffaf4;
+      border-radius: var(--radius);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    pre code {
+      background: transparent;
+      border: 0;
+      color: inherit;
+      padding: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .flow-step {
+      min-height: 176px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      position: relative;
+    }
+
+    .flow-step::before {
+      content: attr(data-step);
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .tech-table th,
+    .tech-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .tech-table th {
+      color: var(--muted);
+      background: #fbf5ee;
+      font-weight: 700;
+    }
+
+    .tech-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--line);
+    }
+
+    .milestone {
+      position: relative;
+      margin: 0 0 22px;
+      padding: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .milestone::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 24px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--rose);
+      border: 3px solid var(--paper);
+    }
+
+    .footer {
+      padding: 34px 0 70px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 860px) {
+      .section-title,
+      .grid,
+      .grid.two {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 86vh;
+        padding: 34px 20px 78px;
+      }
+
+      .tech-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="hero-inner">
+      <div class="eyebrow">Android Native Development Guide · YanYe Home</div>
+      <h1>妍叶之庭<br />Android 原生开发攻略</h1>
+      <p>
+        这份文档把妍叶之庭 YanYe Home 的产品需求转成 Android Studio 里的可执行技术方案：用什么语言、什么 UI 框架、什么数据库、如何同步、怎样分阶段落地。
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="#stack">查看技术栈</a>
+        <a class="button secondary" href="#roadmap">阅读开发路线</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <nav class="nav" aria-label="文档导航">
+      <a href="#summary">总方案</a>
+      <a href="#stack">技术栈</a>
+      <a href="#architecture">架构</a>
+      <a href="#database">数据库</a>
+      <a href="#sync">同步</a>
+      <a href="#privacy">隐私</a>
+      <a href="#roadmap">路线</a>
+      <a href="#start">开始</a>
+    </nav>
+
+    <section id="summary">
+      <div class="section-title">
+        <div>
+          <h2>推荐总方案</h2>
+          <p class="lead">
+            妍叶之庭适合采用现代 Android 原生开发：Kotlin + Jetpack Compose + MVVM/Repository + Room + DataStore + WorkManager，后期再接 Firebase 或 Supabase 做双人同步。
+          </p>
+        </div>
+        <p class="meta">
+          首版不要追求一次做完整云端系统。先把本地闭环做顺：纪念日、愿望、日程、吃什么、备忘、姨妈记录和首页聚合。
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card strong">
+          <span class="tag rose">语言</span>
+          <h3>Kotlin</h3>
+          <p>Android 原生新项目优先选 Kotlin。它和协程、Compose、Room、DataStore 等现代库配合最好，代码也比 Java 更简洁。</p>
+        </article>
+        <article class="card strong">
+          <span class="tag blue">界面</span>
+          <h3>Jetpack Compose</h3>
+          <p>用代码直接写 UI，不再主要依赖 XML。妍叶之庭的首页卡片、状态灯、转盘、冷静模式都很适合状态驱动 UI。</p>
+        </article>
+        <article class="card strong">
+          <span class="tag green">数据</span>
+          <h3>Room + DataStore</h3>
+          <p>Room 存业务对象，DataStore 存轻量设置。这样既能承接复杂关系数据，也不会把 App 偏好混进数据库。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="stack">
+      <div class="section-title">
+        <div>
+          <h2>技术栈选择</h2>
+          <p class="lead">
+            以下组合足够支撑从 V0.1 本地版到 V1.0 双人私密版，不需要一开始引入太多重型后端能力。
+          </p>
+        </div>
+        <p class="meta">
+          选择标准：官方推荐、生态稳定、适合新手学习、后续可扩展。
+        </p>
+      </div>
+
+      <table class="tech-table">
+        <thead>
+          <tr>
+            <th>领域</th>
+            <th>推荐选择</th>
+            <th>用途</th>
+            <th>为什么适合妍叶之庭</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>开发语言</td>
+            <td>Kotlin</td>
+            <td>写业务逻辑、数据库、页面状态</td>
+            <td>现代 Android 主流，代码短，适合长期维护。</td>
+          </tr>
+          <tr>
+            <td>UI 框架</td>
+            <td>Jetpack Compose + Material 3</td>
+            <td>首页、列表、表单、弹窗、导航、动效</td>
+            <td>非常适合今日面板、状态灯、冷静模式这种随数据变化的界面。</td>
+          </tr>
+          <tr>
+            <td>页面导航</td>
+            <td>Navigation Compose</td>
+            <td>页面跳转与底部导航</td>
+            <td>能清晰管理首页、愿望、日程、地图、我的等模块。</td>
+          </tr>
+          <tr>
+            <td>本地数据库</td>
+            <td>Room</td>
+            <td>纪念日、愿望、日程、回忆、餐厅、冲突复盘</td>
+            <td>你的数据对象很多，必须用结构化数据库，而不是简单文件。</td>
+          </tr>
+          <tr>
+            <td>设置存储</td>
+            <td>DataStore</td>
+            <td>下班提醒时间、主题、隐私开关、首次引导状态</td>
+            <td>适合保存小而稳定的用户偏好。</td>
+          </tr>
+          <tr>
+            <td>后台任务</td>
+            <td>WorkManager + Notification</td>
+            <td>纪念日提醒、承诺到期、姨妈期照顾提示</td>
+            <td>能处理不打开 App 时也需要提醒的场景。</td>
+          </tr>
+          <tr>
+            <td>依赖注入</td>
+            <td>Hilt</td>
+            <td>管理 Repository、Database、UseCase</td>
+            <td>项目变大后可以减少手动传对象的混乱。</td>
+          </tr>
+          <tr>
+            <td>图片加载</td>
+            <td>Coil</td>
+            <td>回忆照片、餐厅照片、挑战完成照片</td>
+            <td>Compose 生态友好，加载本地和网络图片都方便。</td>
+          </tr>
+          <tr>
+            <td>后期云同步</td>
+            <td>Firebase 或 Supabase</td>
+            <td>账号、双人同步、照片云存储、推送</td>
+            <td>V0.2 后再接入，避免首版被后端复杂度拖住。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="architecture">
+      <div class="section-title">
+        <div>
+          <h2>App 架构</h2>
+          <p class="lead">
+            建议使用 MVVM + Repository。页面只负责展示，ViewModel 负责状态，Repository 负责数据来源，Room 和云端同步都藏在数据层里面。
+          </p>
+        </div>
+        <p class="meta">
+          这样后期从“本地单机版”升级到“双人同步版”时，不需要重写所有页面。
+        </p>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step" data-step="1">
+          <h3>Compose Screen</h3>
+          <p>显示页面，接收用户点击，例如新增愿望、完成日程、发送状态灯。</p>
+        </div>
+        <div class="flow-step" data-step="2">
+          <h3>ViewModel</h3>
+          <p>保存页面状态，处理按钮事件，把业务动作交给 UseCase 或 Repository。</p>
+        </div>
+        <div class="flow-step" data-step="3">
+          <h3>Repository</h3>
+          <p>统一管理数据读写。页面不需要知道数据来自本地还是云端。</p>
+        </div>
+        <div class="flow-step" data-step="4">
+          <h3>Room / DataStore</h3>
+          <p>保存本地业务数据和用户偏好，支撑 V0.1 私密单机原型。</p>
+        </div>
+        <div class="flow-step" data-step="5">
+          <h3>Remote Sync</h3>
+          <p>后期接 Firebase 或 Supabase，实现双人账号、照片备份和共享同步。</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 18px;">
+        <h3>推荐目录结构</h3>
+        <pre><code>app/src/main/java/com/yanye/home/
+  ui/
+    home/
+    wish/
+    schedule/
+    anniversary/
+    food/
+    care/
+    conflict/
+    memory/
+    map/
+  data/
+    local/
+      entity/
+      dao/
+      database/
+    repository/
+  domain/
+    model/
+    usecase/
+  navigation/
+  di/</code></pre>
+      </div>
+    </section>
+
+    <section id="database">
+      <div class="section-title">
+        <div>
+          <h2>数据库设计</h2>
+          <p class="lead">
+            妍叶之庭的数据核心不是“页面”，而是事件、回忆和关系联动。Room 数据表要围绕可复用对象设计。
+          </p>
+        </div>
+        <p class="meta">
+          图片不要直接塞进数据库。图片文件放本地私有目录，Room 只保存路径；后期云同步再保存 remoteUrl。
+        </p>
+      </div>
+
+      <table class="tech-table">
+        <thead>
+          <tr>
+            <th>数据表</th>
+            <th>存什么</th>
+            <th>典型联动</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>anniversaries</td>
+            <td>纪念日、生日、第一次旅行、提醒规则</td>
+            <td>关联愿望、礼物计划、庆祝回忆</td>
+          </tr>
+          <tr>
+            <td>wishes</td>
+            <td>愿望标题、分类、预算、地点、可见性</td>
+            <td>愿望转日程，纪念日前推荐礼物</td>
+          </tr>
+          <tr>
+            <td>schedules</td>
+            <td>共同事件、时间、地点、预算、完成状态</td>
+            <td>完成后转回忆，地点同步到地图</td>
+          </tr>
+          <tr>
+            <td>memories</td>
+            <td>标题、日期、照片路径、心情、地点</td>
+            <td>回忆进入时间线、地图、纪念日档案</td>
+          </tr>
+          <tr>
+            <td>restaurants</td>
+            <td>餐厅、菜系、忌口、价格、踩雷、最近吃过</td>
+            <td>今天吃什么转盘，城市美食档案</td>
+          </tr>
+          <tr>
+            <td>map_places</td>
+            <td>省份、城市、点亮状态、避坑、评分</td>
+            <td>旅行日程完成后自动点亮城市</td>
+          </tr>
+          <tr>
+            <td>conflict_reviews</td>
+            <td>触发点、情绪、诉求、复盘结论、和好时间</td>
+            <td>生成承诺，进入今日面板待确认</td>
+          </tr>
+          <tr>
+            <td>promises</td>
+            <td>承诺内容、负责人、截止时间、验收人、状态</td>
+            <td>今日面板提醒，对方确认完成</td>
+          </tr>
+          <tr>
+            <td>memos</td>
+            <td>共享备忘、私密备忘、清单、图片、提醒</td>
+            <td>关联日程，进入首页今日卡片</td>
+          </tr>
+          <tr>
+            <td>care_cycles</td>
+            <td>姨妈周期、疼痛、情绪、忌口、照顾偏好</td>
+            <td>本人控制共享范围，对方只看到轻提示</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="card" style="margin-top: 18px;">
+        <h3>重要通用字段</h3>
+        <p>敏感对象建议从第一天就带上隐私字段，后期做双人同步时会省很多麻烦。</p>
+        <pre><code>id
+createdBy
+createdAt
+updatedAt
+visibility: PRIVATE / SHARED / PARTIAL / REVEAL_AFTER_DATE
+sharedWithPartner
+lockedUntil
+isDeleted</code></pre>
+      </div>
+    </section>
+
+    <section id="sync">
+      <div class="section-title">
+        <div>
+          <h2>双人同步策略</h2>
+          <p class="lead">
+            第一版先不要被云同步绊住。妍叶之庭最重要的是把本地产品闭环跑通，再把 Repository 后面的数据源从纯 Room 扩展成 Room + 云端。
+          </p>
+        </div>
+        <p class="meta">
+          同步是第二阶段能力，不是第一阶段必需品。
+        </p>
+      </div>
+
+      <div class="grid two">
+        <article class="card">
+          <span class="tag blue">Firebase</span>
+          <h3>更适合快速上手</h3>
+          <p>可用于登录、Firestore 云数据库、Storage 图片、推送通知。Android 生态成熟，但国内网络、隐私和成本需要提前考虑。</p>
+        </article>
+        <article class="card">
+          <span class="tag green">Supabase</span>
+          <h3>更接近传统后端</h3>
+          <p>基于 PostgreSQL，适合结构化数据和后期可控性。Android 体验不如 Firebase 顺滑，但数据库模型更清晰。</p>
+        </article>
+      </div>
+
+      <div class="card" style="margin-top: 18px;">
+        <h3>推荐阶段</h3>
+        <pre><code>V0.1：Room 本地单机版
+V0.2：账号 + 双人绑定 + 云端备份
+V0.3：共享权限 + 状态灯实时同步 + 推送通知
+V1.0：端到端加密 + 数据导出 + 纪念册</code></pre>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="section-title">
+        <div>
+          <h2>隐私与边界</h2>
+          <p class="lead">
+            情侣 App 最容易做错的地方，是把安全感做成监控感。妍叶之庭应该默认保护敏感内容，分享必须由本人主动选择。
+          </p>
+        </div>
+        <p class="meta">
+          技术设计要服务关系边界，而不是让两个人被功能绑架。
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <span class="tag rose">默认私密</span>
+          <h3>敏感数据先保护</h3>
+          <p>吵架复盘、私密愿望、礼物计划、时光信箱、姨妈记录默认仅创建者可见。</p>
+        </article>
+        <article class="card">
+          <span class="tag green">部分共享</span>
+          <h3>姨妈记录分层展示</h3>
+          <p>本人看到完整记录；对方只看到本人允许共享的轻提示，例如“今天不舒服”“别安排太累”。</p>
+        </article>
+        <article class="card">
+          <span class="tag blue">不做查岗</span>
+          <h3>位置和状态可拒绝</h3>
+          <p>不做常驻定位，不做强制拍照。状态灯和下班打卡都应该可关闭、可撤回、可解释。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="roadmap">
+      <div class="section-title">
+        <div>
+          <h2>开发路线</h2>
+          <p class="lead">
+            对新手来说，最重要的是不要一开始就把所有浪漫想象同时开工。每一版只解决一个清晰目标。
+          </p>
+        </div>
+        <p class="meta">
+          建议 6-8 周做出可用首版，再根据真实使用频率决定下一步。
+        </p>
+      </div>
+
+      <div class="timeline">
+        <div class="milestone">
+          <h3>第 1 阶段：项目骨架</h3>
+          <p>新建 Android Studio 项目，配置 Kotlin、Compose、Material 3、Navigation、Room、DataStore、Hilt。先完成底部导航和空页面。</p>
+        </div>
+        <div class="milestone">
+          <h3>第 2 阶段：本地核心功能</h3>
+          <p>实现纪念日、愿望清单、情侣日历、今天吃什么、备忘、姨妈记录。全部使用 Room 本地存储。</p>
+        </div>
+        <div class="milestone">
+          <h3>第 3 阶段：首页聚合</h3>
+          <p>把最近纪念日、今日日程、待完成备忘、状态提醒、姨妈照顾提示聚合到首页今日面板。</p>
+        </div>
+        <div class="milestone">
+          <h3>第 4 阶段：跨模块联动</h3>
+          <p>完成愿望转日程、日程转回忆、吃什么转餐厅档案、冲突复盘转承诺等关键闭环。</p>
+        </div>
+        <div class="milestone">
+          <h3>第 5 阶段：双人版本</h3>
+          <p>加入账号、情侣绑定、共享与私密权限、状态灯、下班打卡、云端备份和通知推送。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <div class="section-title">
+        <div>
+          <h2>Android Studio 起步设置</h2>
+          <p class="lead">
+            新建项目时尽量选择现代模板，后续少走弯路。
+          </p>
+        </div>
+        <p class="meta">
+          项目名可以用 YanYeHome，包名建议用 com.yanye.home。
+        </p>
+      </div>
+
+      <div class="grid two">
+        <article class="card">
+          <span class="tag gold">新建项目</span>
+          <h3>推荐选择</h3>
+          <ul>
+            <li>Template：Empty Activity</li>
+            <li>Language：Kotlin</li>
+            <li>Minimum SDK：API 26 或 API 28</li>
+            <li>Build configuration：Kotlin DSL</li>
+            <li>UI：Jetpack Compose</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="tag rose">第一批页面</span>
+          <h3>先做能每天打开的功能</h3>
+          <ul>
+            <li>HomeScreen：今日面板</li>
+            <li>AnniversaryScreen：纪念日</li>
+            <li>WishScreen：愿望清单</li>
+            <li>ScheduleScreen：情侣日历</li>
+            <li>FoodDecisionScreen：今天吃什么</li>
+            <li>CareScreen：备忘与姨妈记录</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="card" style="margin-top: 18px;">
+        <h3>一句话原则</h3>
+        <p>妍叶之庭的第一目标不是功能数量，而是让两个人在忙、累、纠结、吵完架的时候，仍然更容易回到彼此身边。技术选型也应该服务这个目标：稳定、私密、可扩展、少折腾。</p>
+      </div>
+    </section>
+
+    <div class="footer">
+      YanYe Home · Android Native Development Guide
+    </div>
+  </main>
+</body>
+</html>
