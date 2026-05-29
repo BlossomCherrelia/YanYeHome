@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YanYeHome 高保真移动端原型</title>
+  <style>
+    :root {
+      --primary: #e94d68;
+      --primary-soft: #fff0f3;
+      --primary-light: #ffd6df;
+      --accent: #ff8a73;
+      --accent-soft: #fff3ea;
+      --berry: #b83255;
+      --bg: #fff7f8;
+      --bg-2: #fffaf4;
+      --card: rgba(255, 255, 255, .92);
+      --text-main: #3a2728;
+      --text-muted: #8f7477;
+      --text-soft: #b9979b;
+      --border: rgba(233, 77, 104, .16);
+      --shadow: 0 18px 42px rgba(201, 89, 111, .16);
+      --shadow-soft: 0 8px 22px rgba(201, 89, 111, .10);
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --phone-w: 390px;
+      font-family: "MiSans", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 16% 8%, rgba(255, 208, 219, .62), transparent 34%),
+        radial-gradient(circle at 88% 12%, rgba(255, 229, 204, .66), transparent 30%),
+        linear-gradient(135deg, #fff4f6 0%, #fffaf3 48%, #fff1f4 100%);
+    }
+    .prototype-shell { padding: 34px 28px 48px; min-width: 1160px; }
+    .cover {
+      position: sticky;
+      left: 28px;
+      z-index: 5;
+      max-width: 1060px;
+      margin-bottom: 26px;
+      padding: 26px 28px;
+      border: 1px solid rgba(255,255,255,.72);
+      border-radius: 30px;
+      background: rgba(255,255,255,.62);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .cover h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: 0; }
+    .cover p { margin: 0; max-width: 880px; color: var(--text-muted); line-height: 1.8; }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .legend span, .page-label {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      color: var(--berry);
+      background: rgba(255,255,255,.76);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .section { margin: 28px 0 34px; }
+    .section-title {
+      position: sticky;
+      left: 28px;
+      display: inline-flex;
+      margin: 0 0 16px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow-soft);
+      color: var(--berry);
+      font-size: 14px;
+    }
+    .phone-row { display: flex; gap: 24px; align-items: flex-start; }
+    .phone-wrap { width: var(--phone-w); flex: 0 0 var(--phone-w); }
+    .page-label { margin: 0 0 10px 14px; }
+    .phone {
+      width: var(--phone-w);
+      height: 844px;
+      overflow: hidden;
+      border-radius: 42px;
+      border: 10px solid #2e2528;
+      background: linear-gradient(180deg, #fff9fa 0%, #fff5ef 100%);
+      box-shadow: 0 24px 50px rgba(71, 38, 45, .22);
+      position: relative;
+    }
+    .screen {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 20% 3%, rgba(255, 207, 216, .68), transparent 30%),
+        linear-gradient(180deg, #fff9fa 0%, #fff4f6 58%, #fffaf3 100%);
+    }
+    .status {
+      height: 38px;
+      padding: 10px 22px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .notch {
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 25px;
+      border-radius: 0 0 16px 16px;
+      background: #2e2528;
+      z-index: 3;
+    }
+    .topbar {
+      height: 58px;
+      padding: 8px 18px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .title-block small { display: block; color: var(--text-muted); font-size: 12px; margin-bottom: 2px; }
+    .title-block h2 { margin: 0; font-size: 22px; letter-spacing: 0; }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 14px;
+      background: rgba(255,255,255,.78);
+      color: var(--berry);
+      box-shadow: var(--shadow-soft);
+      font-size: 17px;
+    }
+    .content {
+      height: calc(100% - 96px);
+      overflow: hidden;
+      padding: 8px 18px 92px;
+    }
+    .content.no-tab { padding-bottom: 22px; }
+    .scroll { height: 100%; overflow: hidden; }
+    .card {
+      margin-bottom: 12px;
+      padding: 15px;
+      border-radius: var(--radius-lg);
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.70);
+      box-shadow: var(--shadow-soft);
+    }
+    .hero-card {
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(233,77,104,.95), rgba(255,138,115,.88)),
+        radial-gradient(circle at 82% 10%, rgba(255,255,255,.35), transparent 28%);
+      border: 0;
+      box-shadow: 0 18px 34px rgba(233,77,104,.26);
+    }
+    .hero-card h3, .card h3 { margin: 0 0 8px; font-size: 17px; }
+    .hero-card p, .card p { margin: 0; color: inherit; line-height: 1.55; font-size: 13px; }
+    .muted { color: var(--text-muted); }
+    .soft { color: var(--text-soft); }
+    .row { display: flex; gap: 10px; align-items: center; }
+    .between { justify-content: space-between; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .metric {
+      min-height: 76px;
+      padding: 12px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fff, #fff4f6);
+      border: 1px solid var(--border);
+    }
+    .metric b { display: block; font-size: 20px; margin-bottom: 4px; color: var(--berry); }
+    .metric span { color: var(--text-muted); font-size: 12px; line-height: 1.35; }
+    .pill-list { display: flex; gap: 8px; overflow: hidden; margin: 10px 0 2px; }
+    .pill {
+      white-space: nowrap;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--berry);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .pill.active { background: var(--primary); color: #fff; border-color: transparent; }
+    .list { display: grid; gap: 9px; }
+    .item {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      padding: 11px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(233,77,104,.10);
+    }
+    .avatar, .mini-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, #ffe3e9, #fff6dc);
+      color: var(--berry);
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .avatar { border-radius: 50%; }
+    .item-main { min-width: 0; flex: 1; }
+    .item-main b { display: block; font-size: 14px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-main span { display: block; font-size: 12px; color: var(--text-muted); line-height: 1.35; }
+    .tag { padding: 5px 8px; border-radius: 999px; background: var(--primary-soft); color: var(--berry); font-size: 11px; font-weight: 800; }
+    .btn {
+      height: 42px;
+      border: 0;
+      border-radius: 16px;
+      padding: 0 14px;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 10px 18px rgba(233,77,104,.18);
+    }
+    .btn.secondary { color: var(--berry); background: #fff; border: 1px solid var(--border); box-shadow: none; }
+    .field {
+      min-height: 48px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .field small { display: block; color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
+    .field b { font-size: 14px; }
+    .tabbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 78px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 8px 12px 14px;
+      background: rgba(255,255,255,.88);
+      border-top: 1px solid rgba(233,77,104,.12);
+      backdrop-filter: blur(18px);
+    }
+    .tab {
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      color: var(--text-soft);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tab i { font-style: normal; font-size: 18px; }
+    .tab.active { color: var(--primary); }
+    .sheet, .modal {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 12px;
+      z-index: 4;
+      padding: 16px;
+      border-radius: 26px;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 -16px 34px rgba(79,41,49,.16);
+      border: 1px solid rgba(255,255,255,.78);
+    }
+    .modal {
+      top: 248px;
+      bottom: auto;
+      text-align: center;
+      box-shadow: 0 18px 44px rgba(79,41,49,.18);
+    }
+    .scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(59, 31, 36, .18);
+      z-index: 3;
+    }
+    .empty {
+      margin-top: 70px;
+      text-align: center;
+      padding: 24px;
+    }
+    .empty .bubble {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 18px;
+      display: grid;
+      place-items: center;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ffe0e8, #fff5d7);
+      font-size: 34px;
+      box-shadow: var(--shadow-soft);
+    }
+    .map {
+      height: 210px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 35% 36%, rgba(233,77,104,.22) 0 6%, transparent 7%),
+        radial-gradient(circle at 62% 48%, rgba(255,138,115,.22) 0 8%, transparent 9%),
+        linear-gradient(135deg, #fff, #ffeef2);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .map::before {
+      content: "";
+      position: absolute;
+      inset: 34px 42px;
+      border-radius: 42% 58% 47% 53%;
+      background: rgba(233,77,104,.12);
+      border: 2px dashed rgba(233,77,104,.25);
+      transform: rotate(-8deg);
+    }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
+    .day {
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      font-size: 12px;
+      background: rgba(255,255,255,.62);
+      color: var(--text-muted);
+    }
+    .day.hot { background: var(--primary); color: #fff; font-weight: 800; }
+    .day.soft-hot { background: #ffe2e8; color: var(--berry); font-weight: 800; }
+    .wheel {
+      width: 214px;
+      height: 214px;
+      margin: 14px auto;
+      border-radius: 50%;
+      background: conic-gradient(#e94d68 0 60deg, #ff9a83 60deg 120deg, #ffc4ce 120deg 180deg, #f6b3c8 180deg 240deg, #ffdba6 240deg 300deg, #fff0f3 300deg 360deg);
+      box-shadow: inset 0 0 0 14px rgba(255,255,255,.55), var(--shadow);
+      position: relative;
+    }
+    .wheel::after {
+      content: "今晚";
+      position: absolute;
+      inset: 72px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--berry);
+      font-weight: 900;
+    }
+    .photo {
+      height: 172px;
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(233,77,104,.25), rgba(255,221,164,.36)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,.35) 0 10px, rgba(255,255,255,.12) 10px 20px);
+      display: grid;
+      place-items: center;
+      color: var(--berry);
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+    .toggle {
+      width: 46px;
+      height: 27px;
+      padding: 3px;
+      border-radius: 999px;
+      background: #ffd6df;
+    }
+    .toggle::after {
+      content: "";
+      display: block;
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      background: #fff;
+      transform: translateX(19px);
+      box-shadow: 0 4px 10px rgba(0,0,0,.10);
+    }
+    .success-mark {
+      width: 92px;
+      height: 92px;
+      margin: 76px auto 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: 40px;
+      box-shadow: var(--shadow);
+    }
+  </style>
+</head>
+<body>
+  <main class="prototype-shell">
+    <header class="cover">
+      <h1>YanYeHome 高保真移动端原型</h1>
+      <p>基于情侣长期共同生活系统重新梳理：今天、日历、空间、关怀、我的五个主入口，串联愿望转日程、日程沉淀回忆、回忆点亮地图、吃饭结果进入餐厅档案、关怀影响今日建议、吵架复盘生成承诺墙。</p>
+      <div class="legend">
+        <span>390px 手机画布</span><span>单文件 HTML/CSS/JS</span><span>统一粉色奶油 Design System</span><span>真实中文内容</span><span>横向全量页面总览</span>
+      </div>
+    </header>
+    <div id="app"></div>
+  </main>
+
+  <script>
+    const tabs = [["今天","⌂"],["日历","◷"],["空间","♡"],["关怀","✦"],["我的","☻"]];
+    const sections = [
+      { title: "核心主导航", pages: [
+        { name:"首页 / 今日", tab:"今天", title:"妍叶之庭", sub:"今天 5月28日", hero:["我们在一起 642 天","距离 700 天纪念日还有 58 天。今天她可能有点不舒服，适合安排轻松一点的约会。"], metrics:[["2","待确认日程"],["7","北京回忆"],["1","承诺待完成"],["18天","下个纪念日"]], pills:["轻松约会","姨妈第2天","想吃日料","周末可安排"], items:[["☕","今晚建议","先点热饮，再决定要不要出门散步","关怀"],["♡","愿望可转日程","有 2 个愿望适合安排到周末","去安排"],["✍","待办备忘","记得买她常用的暖宝宝","今天"]] },
+        { name:"首页卡片展开态", tab:"今天", title:"今日计划", sub:"卡片展开", hero:["晚间共同安排","18:30 下班状态同步后，自动推荐附近清淡餐厅和低强度约会。"], items:[["18:30","下班确认","她预计 19:10 到家，今天不想排队","已同步"],["19:30","晚餐候选","鳗鱼饭、寿喜锅、粥底火锅","吃什么"],["21:00","轻松收尾","一起看 40 分钟综艺，不讨论工作","建议"]], fields:[["联动来源","姨妈记录、下班状态、餐厅偏好"],["完成后","可一键生成今天的小回忆"]] },
+        { name:"今日状态编辑页", tab:"今天", title:"今日状态", sub:"共享给对方", fields:[["我的状态","有点累，但想一起吃晚饭"],["心情","柔软 / 想被抱抱"],["身体","小腹轻微不舒服，疼痛 3/10"],["希望对方","少问决定题，帮我点温热饮品"],["共享范围","仅今天显示，明天自动收起"]], buttons:["保存今日状态","设为仅自己可见"] },
+        { name:"新建快捷记录弹窗", tab:"今天", title:"今天", sub:"快捷记录", modal:["想记录什么？","把今天的小事快速放进共同生活流，之后可以补成回忆、日程或备忘。"], items:[["📷","新增回忆","拍照、地点、心情"],["🗓","新增日程","约会、提醒、预算"],["♡","新增愿望","想去、想吃、想买"],["☕","关怀记录","身体、偏好、提醒"]] },
+        { name:"成功反馈状态页", tab:"今天", title:"已完成", sub:"闭环反馈", success:["已生成今日回忆","晚餐日程已完成，系统已把餐厅、照片和城市同步到回忆与地图。"], buttons:["查看回忆","回到今天"] }
+      ]},
+      { title: "日历与计划", pages: [
+        { name:"日历 / 日程页", tab:"日历", title:"日历", sub:"本周共同安排", calendar:true, pills:["全部","约会","纪念日","旅行","待确认"], items:[["今天","日料还是烧烤？","19:30 · 预算 ¥160 · 可从愿望转入","待定"],["周六","去三里屯拍贴纸照","14:00 · 关联愿望「拍一组夏天照片」","已定"],["6月15日","恋爱 700 天","提前 18 天准备礼物愿望","纪念日"]] },
+        { name:"日程详情页", tab:"日历", title:"晚餐约会", sub:"日程详情", hero:["日料还是烧烤？","根据她今天的身体状态，优先推荐少排队、温热、距离近的餐厅。"], fields:[["时间","今天 19:30 - 21:00"],["地点","望京小街 · 距离双方中点 1.2km"],["预算","¥120 - ¥180"],["关联","愿望「想吃鳗鱼饭」 · 今日关怀提示"]], buttons:["标记完成并生成回忆","编辑日程"] },
+        { name:"新建日程页", tab:"日历", title:"新建日程", sub:"从愿望创建", fields:[["标题","周末去看落日"],["时间","周六 17:30"],["地点","奥森南园 / 可替换"],["参与人","我们两个人"],["预算","¥80"],["关联愿望","想一起看一次粉色晚霞"],["完成动作","提醒补照片并生成回忆"]], buttons:["创建日程","保存草稿"] },
+        { name:"编辑日程页", tab:"日历", title:"编辑日程", sub:"调整安排", fields:[["标题","周末去看落日"],["提醒","提前 2 小时提醒两个人"],["备选方案","如果下雨，改成室内咖啡馆"],["对方确认","需要她确认出发时间"]], buttons:["保存修改","取消本次安排"] },
+        { name:"日程完成确认页", tab:"日历", title:"完成日程", sub:"沉淀为回忆", modal:["今天完成了吗？","确认后会生成一条待完善回忆，并询问是否点亮所在城市。"], fields:[["实际花费","¥146"],["心情","轻松、被照顾"],["下一步","生成回忆草稿 + 餐厅档案更新"]], buttons:["完成并生成回忆","稍后再说"] },
+        { name:"愿望转日程页", tab:"日历", title:"转成日程", sub:"来自愿望清单", hero:["拍一组夏天照片","这个愿望适合本周六，系统已补上地点、时间和预算建议。"], fields:[["推荐时间","周六 16:00 - 18:30"],["推荐地点","蓝色港湾 / 奥森 / 亮马河"],["需要准备","小相机、浅色衣服、驱蚊贴"],["完成后","自动归档到回忆「夏天照片」"]], buttons:["确认生成日程","先收藏方案"] }
+      ]},
+      { title: "空间、地图、愿望与回忆", pages: [
+        { name:"空间首页", tab:"空间", title:"我们的空间", sub:"共同沉淀", hero:["共同生活进度","北京已点亮 7 个回忆，愿望完成 18 个，本月新增 4 条共同记录。"], metrics:[["34","回忆"],["21","愿望"],["7","城市"],["12","餐厅"]], items:[["🗺","点亮地图","北京、上海、杭州有新的回忆","查看"],["♡","愿望清单","2 个愿望可以转成周末日程","安排"],["📷","回忆时间线","上周新增 3 张照片","回看"]] },
+        { name:"点亮地图页", tab:"空间", title:"点亮地图", sub:"中国共同足迹", map:true, metrics:[["7/34","已点亮省份"],["18","城市回忆"],["21%","探索进度"],["3","待补照片"]], items:[["北京","7 个回忆 · 2 个餐厅档案","最近更新"],["浙江","杭州西湖的雨天散步","已点亮"]] },
+        { name:"点亮省份 / 城市管理页", tab:"空间", title:"北京", sub:"城市管理", map:true, items:[["朝阳区","贴纸照、日料、夜间散步","7 回忆"],["海淀区","第一次一起逛校园","2 回忆"],["东城区","纪念日小蛋糕","1 回忆"]], buttons:["新增城市回忆","调整点亮颜色"] },
+        { name:"城市详情页", tab:"空间", title:"北京回忆", sub:"已点亮城市", hero:["北京 · 7 个回忆","这里记录了我们 642 天里最常出现的日常路线。"], items:[["5月20日","三里屯拍贴纸照","照片 9 张"],["4月12日","雨天一起吃寿喜锅","餐厅已收藏"],["2月14日","第一次认真复盘吵架","生成承诺 2 条"]] },
+        { name:"新增旅行回忆页", tab:"空间", title:"新增旅行回忆", sub:"点亮城市", fields:[["城市","杭州"],["日期","2026.06.22 - 06.24"],["同行状态","第一次两个人短途旅行"],["照片","已选择 12 张"],["城市印象","雨很轻，路边桂花味很甜"],["联动","点亮浙江 · 生成回忆时间线"]], buttons:["保存旅行回忆","仅保存草稿"] },
+        { name:"愿望清单页", tab:"空间", title:"愿望", sub:"想一起完成的事", pills:["全部","可安排","想吃","想去","礼物","私密"], items:[["♡","想一起看一次粉色晚霞","适合周六 · 可转日程","可安排"],["🍣","吃一次很认真挑的鳗鱼饭","关联今晚吃什么","想吃"],["🎁","700 天纪念日礼物灵感","提前 18 天提醒","礼物"]] },
+        { name:"愿望详情页", tab:"空间", title:"愿望详情", sub:"粉色晚霞", hero:["想一起看一次粉色晚霞","她在 5月20日添加，适合轻松、不赶时间的约会。"], fields:[["分类","想去 / 拍照"],["最佳时间","晴天 17:30 - 19:00"],["地点候选","奥森、亮马河、蓝色港湾"],["关联纪念日","恋爱 700 天前可完成"],["可见性","两个人可见"]], buttons:["转成日程","编辑愿望"] },
+        { name:"新建愿望页", tab:"空间", title:"新建愿望", sub:"一起期待", fields:[["愿望标题","一起住一次海边民宿"],["分类","旅行 / 放松"],["想完成时间","今年夏天"],["预算感受","¥1200 以内"],["对方参与","需要一起挑城市"],["私密设置","先自己可见，6月1日公开"]], buttons:["保存愿望","保存为私密"] },
+        { name:"编辑愿望页", tab:"空间", title:"编辑愿望", sub:"完善细节", fields:[["标题","一起住一次海边民宿"],["状态","计划中"],["地点候选","青岛 / 厦门 / 威海"],["准备清单","身份证、防晒、拍立得"],["转日程条件","确定周末后自动提醒"]], buttons:["保存修改","标记已完成"] },
+        { name:"私密愿望设置页", tab:"空间", title:"私密设置", sub:"愿望可见性", fields:[["当前状态","仅自己可见"],["公开时间","2026.06.01 09:00"],["公开文案","我想把这个当成夏天的小惊喜"],["对方提醒","公开时轻提醒，不弹窗打扰"]], buttons:["确认设置","立即公开"] },
+        { name:"回忆页", tab:"空间", title:"回忆", sub:"共同生活时间线", pills:["全部","照片","餐厅","旅行","纪念日","修复"], items:[["📷","雨天寿喜锅","北京 · 餐厅档案已更新","9 张"],["🎂","第 600 天小蛋糕","关联纪念日 · 礼物愿望已完成","纪念"],["🤝","认真复盘的一晚","生成承诺墙 2 条","修复"]] },
+        { name:"回忆详情页", tab:"空间", title:"回忆详情", sub:"雨天寿喜锅", photo:"🍲", fields:[["日期","2026.04.12"],["地点","北京 · 朝阳"],["心情","被照顾、很安稳"],["关联","餐厅「小春日和」 · 今日关怀"],["沉淀","已点亮北京，加入餐厅档案"]], buttons:["编辑回忆","查看照片"] },
+        { name:"新建回忆页", tab:"空间", title:"新建回忆", sub:"补全今天", fields:[["标题","今天她喝了热可可"],["日期","今天"],["地点","望京小街"],["照片","已选择 4 张"],["心情标签","温柔、轻松、被照顾"],["是否点亮城市","北京 · 已点亮"]], buttons:["保存回忆","继续添加照片"] },
+        { name:"编辑回忆页", tab:"空间", title:"编辑回忆", sub:"完善记录", fields:[["标题","雨天寿喜锅"],["封面","第 2 张照片"],["共同感受","不用赶路的晚饭最舒服"],["关联愿望","吃一次寿喜锅"],["关联日程","4月12日 晚餐约会"]], buttons:["保存修改","删除回忆"] },
+        { name:"回忆照片查看页", tab:"空间", title:"照片", sub:"9 张", photo:"📷", items:[["精选","她笑得很自然的那张设为封面","封面"],["同步","照片已上传云端，两个人可见","完成"]], buttons:["设为封面","保存到相册"] },
+        { name:"回忆筛选页", tab:"空间", title:"筛选回忆", sub:"缩小时间线", sheet:["筛选条件","按城市、标签、关联模块快速找到共同生活片段。"], pills:["北京","餐厅","纪念日","修复记录","有照片"], buttons:["应用筛选","清空"] }
+      ]},
+      { title: "关怀、饮食与修复", pages: [
+        { name:"关怀页", tab:"关怀", title:"关怀", sub:"今天更懂对方", hero:["她今天需要轻一点","姨妈第 2 天，疼痛 3/10。适合温热饮品、近距离晚餐和少做选择题。"], items:[["🩷","姨妈记录","预计还有 3 天结束，提醒热敷","查看"],["🏠","下班状态","她 19:10 到家，今天不想排队","同步"],["📝","共享备忘录","暖宝宝、布洛芬、低糖热饮","3 条"],["🍽","吃什么","已排除冰饮、辛辣和排队店","去决定"]] },
+        { name:"姨妈记录页", tab:"关怀", title:"姨妈记录", sub:"周期日历", calendar:true, hero:["本次第 2 天","疼痛 3/10，心情偏敏感。已同步给对方今日关怀建议。"], items:[["周期","28 天 · 预测较稳定","正常"],["照顾偏好","热水袋、少问决定题、陪散步","已共享"]] },
+        { name:"新增姨妈记录页", tab:"关怀", title:"新增记录", sub:"身体与照顾", fields:[["开始日期","今天"],["流量","中等"],["疼痛程度","3/10"],["症状","小腹胀、怕冷"],["心情","想被照顾，但不想被追问"],["照顾偏好","热饮、热敷、早点回家"],["共享范围","只给对方显示关怀摘要"]], buttons:["保存记录","仅自己可见"] },
+        { name:"姨妈周期详情页", tab:"关怀", title:"周期详情", sub:"5月周期", metrics:[["28","平均周期"],["5天","平均经期"],["82%","预测可信"],["3/10","本次疼痛"]], items:[["趋势","本月比上月提前 1 天","稳定"],["提醒","下次预计 6月24日，提前 3 天提醒","已开"]] },
+        { name:"照顾偏好设置页", tab:"关怀", title:"照顾偏好", sub:"让关心更准确", fields:[["不舒服时喜欢","直接给方案，不要反复问我"],["饮食偏好","温热、清淡、不要冰饮"],["陪伴方式","可以抱抱，少讲道理"],["提醒对方","用温柔提醒，不要像任务通知"],["共享范围","经期前后 5 天自动展示"]] },
+        { name:"下班状态设置页", tab:"关怀", title:"下班状态", sub:"晚间安排联动", fields:[["今天下班","19:10 到家"],["体力","30% · 不想远路"],["晚餐意愿","可以吃，但不想排队"],["是否接送","希望地铁口见"],["联动","吃什么只推荐 2km 内温热餐厅"]], buttons:["同步给对方","设为今天默认"] },
+        { name:"共享备忘录页", tab:"关怀", title:"共享备忘", sub:"照顾不靠猜", items:[["暖宝宝","家里只剩 2 片，今晚买一盒","今天"],["热饮偏好","少糖热可可，不要冰美式","长期"],["药箱","布洛芬在床头第二个抽屉","重要"]], buttons:["新建备忘","整理长期照顾清单"] },
+        { name:"新建备忘页", tab:"关怀", title:"新建备忘", sub:"共享小提醒", fields:[["标题","买一盒暖宝宝"],["类型","照顾用品"],["提醒时间","今天 18:00"],["可见范围","两个人"],["是否置顶","姨妈期间置顶"]], buttons:["保存备忘","仅自己提醒"] },
+        { name:"编辑备忘页", tab:"关怀", title:"编辑备忘", sub:"暖宝宝", fields:[["标题","买一盒暖宝宝"],["完成状态","未完成"],["提醒","下班前 30 分钟"],["备注","买她常用的薄款"],["首页展示","今天展示"]], buttons:["保存修改","标记完成"] },
+        { name:"吃什么页", tab:"关怀", title:"吃什么", sub:"晚餐不纠结", hero:["今天偏温热清淡","根据关怀状态，已暂时降低烧烤、冰品、排队餐厅权重。"], wheel:true, pills:["餐厅","菜系","规则","只看附近"], buttons:["开始决定","加入餐厅档案"] },
+        { name:"餐厅详情页", tab:"关怀", title:"小春日和", sub:"餐厅档案", hero:["适合不舒服时去","距离近、排队少、热汤好喝。上次雨天吃完生成了一条回忆。"], fields:[["菜系","日式 / 寿喜锅"],["人均","¥86"],["适合场景","轻松晚餐、经期、雨天"],["关联回忆","雨天寿喜锅 · 9 张照片"],["避雷","周五 19:30 后需要等位"]], buttons:["设为今晚结果","编辑餐厅"] },
+        { name:"新建餐厅页", tab:"关怀", title:"新建餐厅", sub:"沉淀吃饭偏好", fields:[["餐厅名","椿屋鳗鱼饭"],["菜系","日料"],["人均","¥92"],["适合状态","疲惫 / 想吃热饭"],["位置","望京小街"],["备注","鳗鱼饭偏甜，她会喜欢"]], buttons:["保存餐厅","保存并加入今晚候选"] },
+        { name:"吃饭结果确认页", tab:"关怀", title:"今晚结果", sub:"决定之后", modal:["今晚吃小春日和","是否把这次晚餐加入餐厅档案，并在完成后生成回忆草稿？"], fields:[["联动","餐厅档案 + 今日回忆 + 北京地图"],["提醒","吃完后 21:00 问一句要不要补照片"]], buttons:["确认并创建日程","重新抽一次"] },
+        { name:"冷静 / 吵架修复页", tab:"关怀", title:"修复", sub:"先保护关系", hero:["进入 20 分钟冷静","暂停争论，只保留感受记录。结束后再一起复盘事实、情绪和下次承诺。"], items:[["冷静模式","正在建议双方暂时不连续发送消息","可开启"],["复盘模板","事实、感受、需求、下一步","3 步"],["承诺墙","上次吵架后还有 1 个承诺待完成","查看"]] },
+        { name:"冷静模式进行中页面", tab:"关怀", title:"冷静中", sub:"还剩 12:36", hero:["先把关系放在前面","现在只记录感受，不做判断。可以写下想被理解的点。"], fields:[["我现在的感受","委屈、害怕被忽略"],["我需要","被认真听完，不要立刻反驳"],["结束后提醒","先互相复述，再讨论解决"]], buttons:["提前结束并复盘","延长 10 分钟"] },
+        { name:"吵架复盘页", tab:"关怀", title:"吵架复盘", sub:"从冲突到承诺", fields:[["发生了什么","晚餐地点临时改变，没有提前说清楚"],["我真正的感受","不是生气吃什么，是觉得没有被一起决定"],["下次怎么做","超过 15 分钟变化要先同步"],["生成承诺","临时变更先发一句确认"]], buttons:["生成承诺墙","保存复盘"] },
+        { name:"承诺墙页", tab:"关怀", title:"承诺墙", sub:"认真修复的证据", items:[["已坚持 12 天","临时改计划前先确认对方感受","进行中"],["待完成","这周安排一次不赶时间的散步","1 个"],["已完成","睡前不继续争对错，先说晚安","完成"]] },
+        { name:"新建承诺页", tab:"关怀", title:"新建承诺", sub:"具体可做到", fields:[["承诺内容","临时变更计划前先发一句确认"],["适用场景","约会、吃饭、出门时间"],["检查频率","每周日晚上"],["提醒语气","温柔提醒，不算账"],["关联复盘","5月20日晚餐争执"]], buttons:["保存承诺","仅加入复盘"] }
+      ]},
+      { title: "我的、设置与系统状态", pages: [
+        { name:"我的 / 设置页", tab:"我的", title:"我的", sub:"空间与偏好", hero:["妍叶之庭","你们已绑定 642 天，空间资料、提醒、隐私和备份都在这里管理。"], items:[["☻","情侣资料","头像、昵称、空间名、邀请码","编辑"],["🔔","提醒设置","纪念日、姨妈、日程、承诺","设置"],["🔒","隐私设置","私密愿望、个人记录、共享范围","设置"],["🎨","主题设置","奶油粉、樱花粉、动态色","设置"],["☁","数据备份","云端同步正常，今天 14:32","查看"]] },
+        { name:"情侣资料编辑页", tab:"我的", title:"情侣资料", sub:"空间身份", fields:[["空间名","妍叶之庭"],["我的昵称","叶子"],["对方昵称","妍妍"],["空间邀请码","YAN520 · 可重新生成"],["在一起日期","2024.08.24"],["头像","使用柔和圆形头像"]], buttons:["保存资料","复制邀请码"] },
+        { name:"提醒设置页", tab:"我的", title:"提醒设置", sub:"温柔不打扰", items:[["纪念日提醒","提前 18 天、7 天、当天","已开"],["姨妈关怀提醒","预测前 3 天，只给对方摘要","已开"],["日程确认","出发前 2 小时提醒双方确认","已开"],["承诺复盘","每周日 21:30 轻提醒","已开"]] },
+        { name:"隐私设置页", tab:"我的", title:"隐私设置", sub:"亲密也有边界", fields:[["私密愿望默认","仅自己可见"],["身体记录共享","只共享关怀摘要"],["吵架复盘","双方确认后进入共同记录"],["照片权限","回忆照片两个人可见"],["导出数据","需要二次确认"]], buttons:["保存隐私设置","查看共享说明"] },
+        { name:"主题设置页", tab:"我的", title:"主题设置", sub:"统一甜蜜氛围", items:[["奶油玫瑰","当前主题 · 柔和粉色和奶油白","使用中"],["樱花晨光","更浅的粉白背景","可选"],["蜜桃晚霞","珊瑚粉强调色更多","可选"]], buttons:["应用主题","跟随系统深浅色"] },
+        { name:"数据备份页", tab:"我的", title:"数据备份", sub:"共同记忆安全", metrics:[["98%","同步完成"],["142","云端记录"],["36","照片"],["0","冲突"]], items:[["最近备份","今天 14:32 自动完成","正常"],["本机缓存","已按情侣空间隔离","安全"],["导出档案","可生成共同生活纪念包","可用"]], buttons:["立即备份","导出数据"] },
+        { name:"登录 / 绑定情侣页", tab:"我的", title:"欢迎回来", sub:"进入妍叶之庭", hero:["只属于你们两个人的生活空间","登录后可以创建情侣空间，或输入对方的邀请码完成绑定。"], fields:[["账号","yanye@example.com"],["密码","••••••••"],["邀请码","YAN520（可选）"]], buttons:["登录并进入空间","创建新账号"] },
+        { name:"新用户引导页", tab:"今天", title:"开始建立空间", sub:"三步完成", items:[["1","设置在一起日期","生成首页天数和纪念日"],["2","邀请对方绑定","共享愿望、日程、回忆"],["3","添加第一个愿望","让共同生活开始流动"]], buttons:["创建情侣空间","我有邀请码"] },
+        { name:"空状态页面", tab:"空间", title:"愿望", sub:"还没有内容", empty:["先放进一个小期待","比如想吃的店、想去的城市、想收到的纪念日礼物。"], buttons:["新增第一个愿望","看看示例"] },
+        { name:"删除确认弹窗", tab:"空间", title:"回忆详情", sub:"删除确认", photo:"📷", modal:["删除这条回忆？","删除后不会影响已点亮城市，但关联照片和日程链接会被移除。"], buttons:["确认删除","取消"] },
+        { name:"Bottom Sheet 操作菜单", tab:"空间", title:"愿望详情", sub:"更多操作", sheet:["更多操作","把愿望变成日程、设为私密、复制给对方或归档。"], items:[["🗓","转成日程","自动带入时间和地点建议","推荐"],["🔒","设为私密","暂时只自己可见","隐私"],["✓","标记完成","完成后可生成回忆","闭环"]] },
+        { name:"筛选弹窗", tab:"空间", title:"回忆", sub:"筛选弹窗", sheet:["筛选回忆","选择城市、时间、标签和关联模块。"], pills:["近 30 天","北京","有照片","餐厅","纪念日","修复"], buttons:["应用","重置"] }
+      ]}
+    ];
+
+    function phone(page) {
+      return `<article class="phone-wrap"><div class="page-label">${page.name}</div><div class="phone"><div class="notch"></div><div class="screen">
+        <div class="status"><span>9:41</span><span>5G  82%</span></div>
+        <div class="topbar"><div class="title-block"><small>${page.sub || ""}</small><h2>${page.title}</h2></div><button class="icon-btn">${page.back ? "‹" : "＋"}</button></div>
+        <div class="content ${page.noTab ? "no-tab" : ""}"><div class="scroll">${body(page)}</div></div>
+        ${tabbar(page.tab)}
+        ${page.modal ? `<div class="scrim"></div><div class="modal">${panel(page.modal)}${buttons(page.buttons)}</div>` : ""}
+        ${page.sheet ? `<div class="scrim"></div><div class="sheet">${panel(page.sheet)}${buttons(page.buttons)}</div>` : ""}
+      </div></div></article>`;
+    }
+    function body(p) {
+      let html = "";
+      if (p.success) html += `<div class="success-mark">✓</div>${panel(p.success, "card")}${buttons(p.buttons)}`;
+      if (p.empty) html += `<div class="empty"><div class="bubble">♡</div><h3>${p.empty[0]}</h3><p class="muted">${p.empty[1]}</p>${buttons(p.buttons)}</div>`;
+      if (p.hero) html += panel(p.hero, "card hero-card");
+      if (p.photo) html += `<div class="photo">${p.photo}</div>`;
+      if (p.map) html += `<div class="map card"></div>`;
+      if (p.wheel) html += `<div class="wheel"></div>`;
+      if (p.metrics) html += `<div class="grid-2">${p.metrics.map(m => `<div class="metric"><b>${m[0]}</b><span>${m[1]}</span></div>`).join("")}</div>`;
+      if (p.pills) html += `<div class="pill-list">${p.pills.map((x,i)=>`<span class="pill ${i===0?"active":""}">${x}</span>`).join("")}</div>`;
+      if (p.calendar) html += calendar();
+      if (p.fields) html += `<div class="card">${p.fields.map(f=>`<div class="field"><small>${f[0]}</small><b>${f[1]}</b></div>`).join("")}</div>`;
+      if (p.items) html += `<div class="list">${p.items.map(item).join("")}</div>`;
+      if (!p.modal && !p.sheet) html += buttons(p.buttons);
+      return html;
+    }
+    function panel(data, cls="card") {
+      return `<div class="${cls}"><h3>${data[0]}</h3><p>${data[1]}</p></div>`;
+    }
+    function item(x) {
+      return `<div class="item"><div class="mini-icon">${x[0]}</div><div class="item-main"><b>${x[1]}</b><span>${x[2]}</span></div>${x[3] ? `<span class="tag">${x[3]}</span>` : ""}</div>`;
+    }
+    function buttons(list) {
+      if (!list) return "";
+      return `<div class="row" style="margin-top:12px">${list.map((b,i)=>`<button class="btn ${i>0 ? "secondary" : ""}" style="flex:1">${b}</button>`).join("")}</div>`;
+    }
+    function tabbar(active) {
+      return `<nav class="tabbar">${tabs.map(t=>`<div class="tab ${t[0]===active?"active":""}"><i>${t[1]}</i><span>${t[0]}</span></div>`).join("")}</nav>`;
+    }
+    function calendar() {
+      const days = ["一","二","三","四","五","六","日", "25","26","27","28","29","30","31","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"];
+      return `<div class="card"><div class="calendar">${days.map((d,i)=>`<div class="day ${[10,11].includes(i)?"hot":([12,13,14].includes(i)?"soft-hot":"")}">${d}</div>`).join("")}</div></div>`;
+    }
+    document.getElementById("app").innerHTML = sections.map(s => `<section class="section"><h2 class="section-title">${s.title}</h2><div class="phone-row">${s.pages.map(phone).join("")}</div></section>`).join("");
+    document.querySelectorAll(".toggle").forEach(t => t.addEventListener("click", () => t.classList.toggle("off")));
+  </script>
+</body>
+</html>

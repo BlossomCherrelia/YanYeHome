@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -155,9 +158,198 @@ fun ImagePickerField(
     }
 }
 
+@Composable
+fun MultiImagePickerField(
+    label: String,
+    imageUris: List<String>,
+    onImageUrisChange: (List<String>) -> Unit,
+    modifier: Modifier = Modifier,
+    maxImages: Int = 9,
+    module: String = "images",
+    onUploadStateChange: (ImageUploadState) -> Unit = {}
+) {
+    val context = LocalContext.current
+    val uploadService = remember(context) { CloudBaseImageUploadService(context) }
+    val scope = rememberCoroutineScope()
+    var uploadState by remember { mutableStateOf<String?>(null) }
+    var deleteMode by remember { mutableStateOf(false) }
+
+    LaunchedEffect(imageUris) {
+        if (imageUris.isEmpty()) {
+            onUploadStateChange(ImageUploadState())
+            deleteMode = false
+        }
+    }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        val existingUris = imageUris.take(maxImages)
+        val remainingSlots = (maxImages - existingUris.size).coerceAtLeast(0)
+        val selectedUris = uris.take(remainingSlots)
+        if (selectedUris.isEmpty()) return@rememberLauncherForActivityResult
+        selectedUris.forEach { uri ->
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
+        }
+        val localUris = selectedUris.map(Uri::toString)
+        val pendingUris = (existingUris + localUris).distinct().take(maxImages)
+        onImageUrisChange(pendingUris)
+        uploadState = "正在上传..."
+        onUploadStateChange(ImageUploadState(isUploading = true))
+        scope.launch {
+            val uploaded = mutableListOf<String>()
+            val failed = runCatching {
+                selectedUris.forEach { uri ->
+                    uploaded += uploadService.uploadImage(uri, module)
+                }
+            }.exceptionOrNull()
+            if (failed == null) {
+                onImageUrisChange((existingUris + uploaded).distinct().take(maxImages))
+                onUploadStateChange(ImageUploadState())
+                uploadState = "已上传云端"
+            } else {
+                onUploadStateChange(
+                    ImageUploadState(errorMessage = failed.message ?: "未知错误")
+                )
+                uploadState = "云端上传失败，暂存本地图片：${failed.message ?: "未知错误"}"
+            }
+        }
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(0.6.dp, YanYeColors.Line),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = label,
+                    color = YanYeColors.Muted,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (imageUris.isNotEmpty()) {
+                        TextButton(onClick = { deleteMode = !deleteMode }) {
+                            Text(if (deleteMode) "完成" else "删除", color = YanYeColors.Rose)
+                        }
+                    }
+                    OutlinedButton(onClick = { launcher.launch(arrayOf("image/*")) }) {
+                        Text(if (imageUris.isEmpty()) "选择图片" else "更换图片")
+                    }
+                }
+            }
+            Text(
+                text = "最多9张",
+                color = YanYeColors.Muted.copy(alpha = 0.72f),
+                style = MaterialTheme.typography.bodySmall
+            )
+            uploadState?.let { state ->
+                Text(
+                    text = state,
+                    color = if (state.startsWith("云端上传失败")) YanYeColors.Rose else YanYeColors.Muted,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (imageUris.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    imageUris.take(maxImages).chunked(3).forEach { rowUris ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            rowUris.forEach { imageUri ->
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .aspectRatio(1f)
+                                        .clip(MaterialTheme.shapes.medium)
+                                ) {
+                                    SquareImagePreview(
+                                        imageUri = imageUri,
+                                        contentDescription = label,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                    if (deleteMode) {
+                                        Box(
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .padding(5.dp)
+                                                .size(22.dp)
+                                                .background(Color.Black.copy(alpha = 0.52f), CircleShape)
+                                                .clickable {
+                                                    onImageUrisChange(imageUris.filterNot { it == imageUri })
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = "×",
+                                                color = Color.White,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            repeat(3 - rowUris.size) {
+                                Box(modifier = Modifier.weight(1f))
+                            }
+                        }
+                    }
+                }
+                if (imageUris.size < maxImages) {
+                    OutlinedButton(
+                        onClick = { launcher.launch(arrayOf("image/*")) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("继续添加图片 ${imageUris.size}/$maxImages")
+                    }
+                }
+            }
+        }
+    }
+}
+
 fun isLocalOnlyImageUri(imageUri: String): Boolean {
     val value = imageUri.trim()
     return value.startsWith("content://") || value.startsWith("file://")
+}
+
+@Composable
+private fun SquareImagePreview(
+    imageUri: String?,
+    modifier: Modifier = Modifier,
+    contentDescription: String = "图片"
+) {
+    val context = LocalContext.current
+    var previewBitmap by remember(imageUri) { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(imageUri) {
+        previewBitmap = withContext(Dispatchers.IO) {
+            loadBitmap(context, imageUri)
+        }
+    }
+    val bitmap = previewBitmap ?: return
+    Image(
+        bitmap = bitmap.asImageBitmap(),
+        contentDescription = contentDescription,
+        modifier = modifier,
+        contentScale = ContentScale.Crop
+    )
 }
 
 @Composable

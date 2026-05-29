@@ -1394,3 +1394,97 @@ CloudBase function note:
 - Because of this, the cloud function should transparently persist the new city memory fields without code changes.
 - Re-uploading `syncFootprints` is not required if the deployed online function matches the local version.
 - Re-upload `syncFootprints.zip` only if the Tencent CloudBase console has an older or manually modified version that does not use passthrough payload writing.
+
+## Git / Memory Multi-Image / CloudBase Status - 2026-05-29
+
+Git baseline:
+
+- `/Users/a86153/Desktop/YanYeHome` is now a local Git repository.
+- Initial commit:
+  - `abd2971 Initial YanYeHome project`
+- Remote repository:
+  - `git@github.com:BlossomCherrelia/YanYeHome.git`
+- `main` tracks `origin/main`.
+- `.gitignore` excludes build/local/generated-heavy files including:
+  - `.gradle/`
+  - `**/build/`
+  - `local.properties`
+  - `.DS_Store`
+  - `.Rhistory`
+  - `*.hprof`
+- Important: `java_pid73717.hprof` was intentionally not committed.
+
+Memory image update:
+
+- Regular `Memory` records now support multiple images without a database migration.
+- Existing `photoUris` string is reused as newline/comma/semicolon separated URI storage.
+- New/edit memory uses `MultiImagePickerField`.
+- Up to 9 images are supported.
+- Existing single-image memories remain compatible.
+- Edit/new image picker layout:
+  - square `1:1` thumbnails
+  - 3 columns per row
+  - all 9 images can display in the editor
+  - `删除` toggles delete mode
+  - delete mode shows a small `×` on each image
+  - tapping `×` deletes only that single image
+  - `继续添加图片 x/9` appends images instead of replacing existing ones
+- Memory list/detail outside display:
+  - 1 image: single cover image
+  - 2 images: two square images in one row
+  - 3 images: three square images in one row
+  - more than 3: first three display, third image shows a small arrow hint
+  - tapping any image opens a dialog preview
+  - dialog preview uses horizontal swiping for up to 9 images
+- Memory detail page no longer shows the `内容` heading or a content card; note text displays directly on the wallpaper background.
+
+CloudBase / image upload status:
+
+- Local app code calls these CloudBase endpoints through `CloudBaseConfig`:
+  - `syncAnniversaries`
+  - `syncWishes`
+  - `syncSchedules`
+  - `syncRestaurants`
+  - `syncFootprints`
+  - `syncCareCycles`
+  - `syncMemos`
+  - `syncMemories`
+  - `uploadImage`
+  - `registerUser`
+  - `loginUser`
+  - `createCoupleSpace`
+  - `createInviteCode`
+  - `joinCoupleSpaceByInvite`
+  - `getCurrentSessionProfile`
+  - `updateSessionProfile`
+- Local `cloudfunctions/` contains matching function directories and zip files for all endpoints above.
+- On 2026-05-29, empty POST requests were sent to the online CloudBase HTTP URLs for all endpoints above.
+- All endpoints responded with function-specific validation errors such as:
+  - `coupleId is required`
+  - `userId is required`
+  - `username is required`
+- This confirms the online functions exist and are routed; they are not missing/404 placeholders.
+- `uploadImage` is implemented locally and online:
+  - app uploads compressed JPEG bytes to `uploadImage`
+  - cloud function uses `app.uploadFile`
+  - cloud function returns both `fileID` and `url`
+  - app currently stores `url` first, falling back to `fileID`
+- Current risk:
+  - returned `url` is produced via `getTempFileURL`
+  - if CloudBase storage is not configured as public readable, old stored URLs can expire and uploaded images may stop opening
+- Short-term workaround:
+  - configure Tencent CloudBase storage read permission as `所有用户可读`
+- Safer long-term direction:
+  - store permanent `fileID` in app data
+  - resolve it to a fresh temp URL when displaying images
+  - this avoids expired image URLs without making storage broadly public.
+
+Test APK:
+
+- A debug test APK was built on 2026-05-29.
+- Desktop copy:
+  - `/Users/a86153/Desktop/YanYeHome-test-debug.apk`
+- Original build output:
+  - `/Users/a86153/Desktop/YanYeHome/app/build/outputs/apk/debug/app-debug.apk`
+- Approx size:
+  - `48MB`

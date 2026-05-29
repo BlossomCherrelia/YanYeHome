@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.ui.draw.clip
@@ -64,9 +66,9 @@ import com.yanye.home.domain.model.Memory
 import com.yanye.home.domain.model.MemoryMood
 import com.yanye.home.domain.model.Schedule
 import com.yanye.home.ui.common.AutoSyncLifecycleEffect
-import com.yanye.home.ui.common.ImagePickerField
 import com.yanye.home.ui.common.ImagePreviewBox
 import com.yanye.home.ui.common.ImageUploadState
+import com.yanye.home.ui.common.MultiImagePickerField
 import com.yanye.home.ui.common.PageChrome
 import com.yanye.home.ui.common.SecondaryTopBar
 import com.yanye.home.ui.common.WallpaperBackground
@@ -74,12 +76,15 @@ import com.yanye.home.ui.common.isLocalOnlyImageUri
 import com.yanye.home.ui.schedule.ScheduleViewModel
 import com.yanye.home.ui.theme.YanYeColors
 import java.io.File
+import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private sealed interface MemoryPage {
     data object List : MemoryPage
@@ -287,11 +292,13 @@ private fun TimelineMemoryCard(
     onClick: () -> Unit
 ) {
     val date = LocalDate.ofEpochDay(memory.dateEpochDay)
+    val imageUris = remember(memory.photoUris) { memoryPhotoUris(memory.photoUris) }
+    var previewIndex by remember { mutableStateOf<Int?>(null) }
     Row(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
                 .width(36.dp)
-                .heightIn(min = if (firstPhotoUri(memory.photoUris) != null) 200.dp else 124.dp),
+                .heightIn(min = if (imageUris.isNotEmpty()) 200.dp else 124.dp),
             contentAlignment = Alignment.TopCenter
         ) {
             if (!isFirst) {
@@ -361,17 +368,24 @@ private fun TimelineMemoryCard(
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
-                firstPhotoUri(memory.photoUris)?.let { photoUri ->
-                    MemoryPhotoPreview(
-                        photoUri = photoUri,
+                if (imageUris.isNotEmpty()) {
+                    MemoryPhotoStrip(
+                        imageUris = imageUris,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 10.dp),
-                        maxHeight = 360.dp
+                        onImageClick = { previewIndex = it }
                     )
                 }
             }
         }
+    }
+    previewIndex?.let { index ->
+        MemoryImagePreviewDialog(
+            imageUris = imageUris,
+            initialIndex = index,
+            onDismiss = { previewIndex = null }
+        )
     }
 }
 
@@ -382,6 +396,8 @@ private fun MemoryDetailPage(
     onBack: () -> Unit,
     onEdit: () -> Unit
 ) {
+    val imageUris = remember(memory.photoUris) { memoryPhotoUris(memory.photoUris) }
+    var previewIndex by remember { mutableStateOf<Int?>(null) }
     WallpaperBackground(imageResId = R.drawable.simple_wallpaper) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -398,10 +414,10 @@ private fun MemoryDetailPage(
             )
         }
         item {
-            MemoryPhotoPreview(
-                photoUri = firstPhotoUri(memory.photoUris),
+            MemoryPhotoStrip(
+                imageUris = imageUris,
                 modifier = Modifier.fillMaxWidth(),
-                maxHeight = 900.dp
+                onImageClick = { previewIndex = it }
             )
         }
         item {
@@ -423,27 +439,11 @@ private fun MemoryDetailPage(
         if (memory.note.isNotBlank()) {
             item {
                 Text(
-                    text = "内容",
-                    color = YanYeColors.Ink,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    text = memory.note,
+                    color = YanYeColors.Muted,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    border = BorderStroke(0.6.dp, YanYeColors.Line),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text(
-                        text = memory.note,
-                        color = YanYeColors.Muted,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
             }
         }
         /*
@@ -503,6 +503,13 @@ private fun MemoryDetailPage(
         */
     }
     }
+    previewIndex?.let { index ->
+        MemoryImagePreviewDialog(
+            imageUris = imageUris,
+            initialIndex = index,
+            onDismiss = { previewIndex = null }
+        )
+    }
 }
 
 @Composable
@@ -519,7 +526,8 @@ private fun MemoryEditorPage(
     var note by remember(initialMemory?.id) { mutableStateOf(initialMemory?.note.orEmpty()) }
     var imageUploadState by remember { mutableStateOf(ImageUploadState()) }
     var showDatePicker by remember { mutableStateOf(false) }
-    val hasPendingLocalImage = photoUris.isNotBlank() && isLocalOnlyImageUri(photoUris)
+    val photoUriList = remember(photoUris) { memoryPhotoUris(photoUris) }
+    val hasPendingLocalImage = photoUriList.any(::isLocalOnlyImageUri)
     val imageBlockingMessage = when {
         imageUploadState.isUploading -> "图片上传中，请稍后再保存"
         imageUploadState.errorMessage != null -> "图片上传失败，请重试或移除图片"
@@ -587,11 +595,10 @@ private fun MemoryEditorPage(
             )
         }
         item {
-            ImagePickerField(
+            MultiImagePickerField(
                 label = "照片",
-                imageUri = photoUris,
-                onImageUriChange = { photoUris = it },
-                height = 300.dp,
+                imageUris = photoUriList,
+                onImageUrisChange = { photoUris = it.take(9).joinToString("\n") },
                 module = "memories",
                 onUploadStateChange = { imageUploadState = it }
             )
@@ -662,18 +669,140 @@ private fun MemoryEditorPage(
 }
 
 @Composable
-private fun MemoryPhotoPreview(
-    photoUri: String?,
+private fun MemoryPhotoStrip(
+    imageUris: List<String>,
     modifier: Modifier = Modifier,
-    maxHeight: Dp = 360.dp
+    onImageClick: (Int) -> Unit
 ) {
-    ImagePreviewBox(
-        imageUri = photoUri,
-        contentDescription = "照片",
-        modifier = modifier,
-        minHeight = 0.dp,
-        maxHeight = maxHeight
+    if (imageUris.isEmpty()) return
+    if (imageUris.size == 1) {
+        Box(modifier = modifier.clickable { onImageClick(0) }) {
+            ImagePreviewBox(
+                imageUri = imageUris.first(),
+                contentDescription = "照片",
+                modifier = Modifier.fillMaxWidth(),
+                minHeight = 0.dp,
+                maxHeight = 360.dp
+            )
+        }
+        return
+    }
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        imageUris.take(3).forEachIndexed { index, imageUri ->
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f)
+                    .clip(MaterialTheme.shapes.medium)
+                    .clickable { onImageClick(index) }
+            ) {
+                MemorySquareImage(
+                    imageUri = imageUri,
+                    modifier = Modifier.fillMaxSize()
+                )
+                if (index == 2 && imageUris.size > 3) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 6.dp)
+                            .background(Color.Black.copy(alpha = 0.35f), CircleShape)
+                            .size(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("›", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MemorySquareImage(
+    imageUri: String,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    var bitmap by remember(imageUri) { mutableStateOf<android.graphics.Bitmap?>(null) }
+    LaunchedEffect(imageUri) {
+        bitmap = withContext(Dispatchers.IO) {
+            loadMemoryBitmap(context, imageUri)
+        }
+    }
+    bitmap?.let {
+        Image(
+            bitmap = it.asImageBitmap(),
+            contentDescription = "照片",
+            modifier = modifier,
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+private fun MemoryImagePreviewDialog(
+    imageUris: List<String>,
+    initialIndex: Int,
+    onDismiss: () -> Unit
+) {
+    val safeImages = imageUris.take(9)
+    if (safeImages.isEmpty()) return
+    val pagerState = rememberPagerState(
+        initialPage = initialIndex.coerceIn(0, safeImages.lastIndex),
+        pageCount = { safeImages.size }
     )
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.Black.copy(alpha = 0.92f),
+            shape = MaterialTheme.shapes.large
+        ) {
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${pagerState.currentPage + 1}/${safeImages.size}",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    TextButton(onClick = onDismiss) {
+                        Text("关闭", color = Color.White)
+                    }
+                }
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 260.dp, max = 620.dp)
+                ) { page ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 260.dp, max = 620.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ImagePreviewBox(
+                            imageUri = safeImages[page],
+                            contentDescription = "照片",
+                            modifier = Modifier.fillMaxWidth(),
+                            minHeight = 220.dp,
+                            maxHeight = 620.dp
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -933,8 +1062,27 @@ private fun DatePickerPopup(
     }
 }
 
-private fun firstPhotoUri(photoUris: String): String? =
-    photoUris.split('\n', ',', ';').map(String::trim).firstOrNull { it.isNotBlank() }
+private fun memoryPhotoUris(photoUris: String): List<String> =
+    photoUris.split('\n', ',', ';')
+        .map(String::trim)
+        .filter(String::isNotBlank)
+        .distinct()
+        .take(9)
+
+private fun loadMemoryBitmap(context: android.content.Context, imageUri: String?): android.graphics.Bitmap? {
+    val uriText = imageUri?.takeIf(String::isNotBlank) ?: return null
+    return runCatching {
+        when {
+            uriText.startsWith("content://") || uriText.startsWith("file://") ->
+                context.contentResolver.openInputStream(Uri.parse(uriText))?.use(BitmapFactory::decodeStream)
+
+            uriText.startsWith("http://") || uriText.startsWith("https://") ->
+                URL(uriText).openStream().use(BitmapFactory::decodeStream)
+
+            else -> BitmapFactory.decodeFile(File(uriText).absolutePath)
+        }
+    }.getOrNull()
+}
 
 private fun buildMemoryTimelineEntries(rows: List<Memory>): List<MemoryTimelineEntry> {
     val entries = mutableListOf<MemoryTimelineEntry>()
